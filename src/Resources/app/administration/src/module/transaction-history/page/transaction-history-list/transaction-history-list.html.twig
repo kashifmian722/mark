@@ -1,0 +1,50 @@
+{% block mp_transaction_history_list %}
+    <sw-page class="">
+        {% block transction_history_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block mp_transaction_history_list_smart_bar_header_title %}
+                    <h2>
+                        {% block mp_transaction_history_list_smart_bar_header_title_text %}
+                            {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                            {{ $tc('mp-transaction-history.general.mainMenuItemList') }}
+                        {% endblock %}
+
+                        {% block mp_transaction_history_list_smart_bar_header_amount %}
+                            <span v-if="total" class="sw-page__smart-bar-amount">
+                                ({{total}})
+                            </span>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+        <template slot="content">
+            <sw-entity-listing
+                    :items="transactionCollection"
+                    :repository="commissionRepository"
+                    :showSelection="false"
+                    :columns="columns">
+                 {# customer name #}
+                    <template slot="column-customerName" slot-scope="{ item }">
+                        <router-link :to="{ name: 'sw.customer.detail.base', params: { id: item.marketplace_seller.customer.id }  }">
+                            {{ item.marketplace_seller.customer.firstName }} {{ item.marketplace_seller.customer.lastName }}
+                        </router-link>
+                    </template>
+                    <template slot="column-sellerEarning" slot-scope="{item}">
+                        {{item.sellerEarning| currency(item.marketplace_order.currency.isoCode)}}
+                    </template>
+                    {# Disable delete button #}
+                    <template slot="actions" slot-scope="{ item }">
+                        {% block mp_transaction_history_list_grid_columns_actions_delete %}
+                            <sw-context-menu-item variant="danger" disabled>
+                                {# {{ $tc('sw-order.list.contextMenuDelete') }} #}
+                            </sw-context-menu-item>
+                        {% endblock %}
+                    </template>
+
+            </sw-entity-listing>
+
+        </template>
+    </sw-page>
+{% endblock %}

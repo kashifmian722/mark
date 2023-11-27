@@ -1,0 +1,22 @@
+.is--active {
+    color: #37D046;
+}
+
+.is--active svg,
+.is--active path
+{
+    fill: currentColor;
+}
+
+.is--inactive {
+    color: #DE294C;
+}
+
+.is--inactive svg,
+.is--inactive path
+{
+    fill: currentColor;
+}
+.mp-product-view span {
+    cursor: pointer;
+}

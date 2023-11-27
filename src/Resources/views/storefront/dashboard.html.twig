@@ -1,0 +1,8 @@
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
+
+{% block page_account_main_content %}
+<div id="app"></div>
+    {% include '@WebkulMVMarketplace/storefront/vue-components/dashboard/index.html.twig' %}
+    {% include '@WebkulMVMarketplace/storefront/vue-components/dashboard/transaction.html.twig' %}
+    {% include '@WebkulMVMarketplace/storefront/vue-components/dashboard/style.html.twig' %}
+{% endblock %}

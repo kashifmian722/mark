@@ -1,0 +1,22 @@
+{
+"mp-transaction":{
+    "general":{
+        "mainMenuItemList": "Marketplace Transaction",
+        "descriptionTextModule": "Manage Marketplace Transaaction Here",
+        "mainMenuItemGeneral": "Marketplace",
+        "mainMenuItemListHeading": "Manage Transaction"
+    },
+    "list":{
+        "selectOption": ["Paid", "Unpaid"],
+        "selectStatusPlacholder": "Payment Status",
+        "contextMenuEdit": "Edit",
+        "columnCollection": ["Customer Name", "Customer Email", "Total Order", "Total Amount", "Admin Income", "Seller Income","Paid To Seller", "Remaining Amount", "Action"]
+    },
+    "detail":{
+        "payLinkText": "Pay To Seller",
+        "transactionModalTitle": "Pay To Seller",
+        "titleSaveSuccess": "Save",
+        "messageSaveSuccess": "Transaction Completed Success"
+    }
+}
+}

@@ -1,0 +1,122 @@
+<sw-page class="mp-order-list">
+        {% block wk_mp_seller_smart_bar_actions %}
+            <template slot="smart-bar-actions">
+                {% block payment_status %}
+                <sw-select-field :placeholder="$t('mp-transaction.list.selectStatusPlacholder')" @change="onChangeStatus($event)">
+                    <option value="1">{{$t('mp-transaction.list.selectOption[0]')}}</option>
+                    <option value="0">{{$t('mp-transaction.list.selectOption[1]')}}</option>
+                </sw-select-field>
+                {% endblock %}
+                {% block cancel_button %}
+                <sw-button style="height:46px" :routerLink="{name: 'mp.transaction.list'}" >
+                    {{$t('mp-seller.detail.cancelButtonText')}}
+                </sw-button>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+    <template slot="content">
+        {% block mp_transaction_list_content %}
+            {# transaction modal#}
+            <sw-modal
+                v-if="showModal"
+                @modal-close="showModal =isModalLoading = false"
+                :title="$tc('mp-transaction.detail.transactionModalTitle')"
+                variant="small">
+                <sw-textarea-field v-model="transactionMessage"></sw-textarea-field>
+
+                <template #modal-footer>
+                    <sw-button 
+                        @click="cancelModal"
+                        size="small"
+                        :disabled="isModalLoading">
+                        cancel
+                    </sw-button>
+
+                    <sw-button @click="paySeller(transactionMessage)" variant="primary" size="small" :isLoading="isModalLoading">
+                        Submit
+                    </sw-button>
+                </template>
+            </sw-modal>
+            <sw-entity-listing
+                v-if="marketplaceOrderCollection"
+                :isLoading="orderListLoader"
+                :items="marketplaceOrderCollection"
+                :repository="commissionRepository"
+                :showSelection="true"
+                :columns="columns"
+                @select-item="onSelectionChanged"
+                @select-all-items="onSelectionChanged">
+                {# order id#}
+                <template slot="column-orderNumber" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.order.detail', params: { id: item.marketplace_order.order.id }  }">
+                        {{ item.marketplace_order.order.orderNumber}}
+                    </router-link>
+                </template>
+
+                {# product name #}
+                <template slot="column-productName" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.product.detail.base', params: { id: item.marketplace_order.marketplace_product.productId }  }">
+                        {{ item.marketplace_order.marketplace_product.product.name }}
+                    </router-link>
+                </template>
+
+                {# order_line_item quantity #}
+                <template slot="column-quantity" slot-scope="{ item }">
+                    {{ item.marketplace_order.order_line_item.quantity }}
+                </template>
+
+                {# order's total amount #}
+                <template slot="column-totalAmount" slot-scope="{ item }">
+                    {{ item.marketplace_order.order_line_item.price.totalPrice | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# seller's earnings #}
+                <template slot="column-sellerEarnings" slot-scope="{ item }">
+                    {{ item.sellerEarning | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# owner's commission #}
+                <template slot="column-commissionAmount" slot-scope="{ item }">
+                    {{ item.commissionAmount | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# created at date #}
+                <template slot="column-createdAt" slot-scope="{ item }">
+                    {{ item.createdAt | date() }}
+                </template>
+                {# transaction status#}
+                <template slot="column-isPaid" slot-scope="{item}">
+                    <div v-if="item.isPaid == true">Paid</div>
+                    <div v-else>Not Paid</div>
+                </template>
+
+                {# Disable delete button #}
+                <template slot="actions" slot-scope="{ item }">
+                    {% block mp_transaction_list_grid_columns_actions_delete %}
+                        <sw-context-menu-item variant="danger" disabled>
+                            {{ $tc('sw-order.list.contextMenuDelete') }}
+                        </sw-context-menu-item>
+                    {% endblock %}
+                </template>
+                {# bulk action #}
+                    <template slot="bulk">
+                        {% block mp_transction_payble_amount %}
+                            <span v-if="paybleAmount" class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-label">Payble Amount:</span>
+                            <span v-if="paybleAmount" class="sw-data-grid__bulk-selected sw-data-grid__bulk-selected-count">{{paybleAmount}}</span>
+                        {% endblock %}
+                        {% block sw_data_grid_bulk_selected_actions_content %}
+                            <span class="sw-data-grid__bulk-selected bulk-link">
+                            <a class="link link-default" @click="openModal">
+                                {{ $tc('mp-transaction.detail.payLinkText') }}
+                            </a></span>
+                            
+                        {% endblock %}
+                    </template>
+            </sw-entity-listing>
+
+            <sw-empty-state v-if="orderListLoader && !total" :icon="$tc('mp-order.general.orderIcon')" color="rgb(160, 146, 240)" :title="$tc('mp-order.list.messageEmpty')"></sw-empty-state>
+        {% endblock %}
+    </template>
+
+</sw-page>

@@ -1,0 +1,53 @@
+{
+    "mp-seller": {
+        "general": {
+            "icon": "default-avatar-multiple",
+            "mainMenuItemGeneral": "Marketplace",
+            "descriptionTextModule": "Manage marketplace sellers here.",
+            "mainMenuItemList": "Marketplace Sellers",
+            "mainMenuItemListHeading": "Manage Sellers"
+        },
+        "list": {
+            "messageEmpty": "No sellers yet.",
+            "columnCollection": ["Name", "Email", "Is Apply", "Is Approved", "Total Orders", "Created At", "Seller Type", "Commission %","Admin Income","Seller Income"],
+            "titleSaveSuccess": "Success",
+            "messageSaveSuccess": "Seller has been updated.",
+            "titleSaveError": "Error",
+            "textTypeClient": " Private Client",
+            "textTypeCompany": " Company",
+            "messageSaveError": "Unfortunately something went wrong.",
+            "approveSellerSuccessMessage": "Sellers approved successfully!",
+            "disapproveSellerMessage": "Sellers disapproved successfully!",
+            "addSellerButtonLabel": "Add Seller"
+        },
+        "detail": {
+            "emailLabel": "Email",
+            "isAppliedLabel": "Is Applied",
+            "isApprovedLabel": "Is Approved",
+            "appliedText": "Applied",
+            "notAppliedText": "Not Applied",
+            "approvedText": "Approved",
+            "notApprovedText": "Not Approved",
+            "errorTitle": "Error saving the seller",
+            "cancelButtonText": "Cancel",
+            "saveButtonText": "Save",
+            "commissionLabel": "Commission Percenatage",
+            "storelogoLabel": "Store Logo",
+            "bannerlogoLabel": "Banner Logo",
+            "ownerlogoLabel": "Owner Logo",
+            "storeSlugLabel": "Store Slug",
+            "storeOwnerLabel": "Store Owner",
+            "storeTitleLabel": "Store Title",
+            "storeDescriptionLabel": "Store Description",
+            "profileStatusLabel": "Profile Status",
+            "sellerStatusLabel": "Seller Status"
+        },
+        "create":{
+            "selectCustomerLabel": "Select Customer",
+            "successTitle": "Success",
+            "successMessage": "Sellers Added Successfully",
+            "infoTitle": "info",
+            "selectCustomerMessage": "Select the customers to become sellers"
+        }
+    }
+}

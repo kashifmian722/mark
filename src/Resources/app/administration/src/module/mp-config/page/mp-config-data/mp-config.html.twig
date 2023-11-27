@@ -1,0 +1,135 @@
+<sw-page>
+    <template slot="smart-bar-header">
+        <h2>
+            {{ $tc('sw-settings.index.title') }} <sw-icon name="small-arrow-medium-right" small></sw-icon> 
+            {{$tc('wk-mp-config.label.smartBarHeading')}}
+        </h2>
+    </template>
+    <template slot="smart-bar-actions">
+        <sw-button-process
+            :disabled="isLoading"
+            variant="primary"
+            :processSuccess="processSuccess"
+            @click="onSaveConfig">
+            {{$tc('wk-mp-config.label.saveButtonText')}}
+        </sw-button-process>
+    </template>
+    <template #content>
+        <sw-card-view>
+            <sw-card title="Landing Page Settings">
+                <sw-select-field v-if="salesChannelCollection" :label="$t('wk-mp-config.label.salesChannelLabel')" v-model="saleschannelId" @change="changeSaleschannel">
+                    <option :value="null">All Sales Channels</option>
+                    <option v-for="salesChannel in salesChannelCollection" :value="salesChannel.id" :key="salesChannel.id">{{salesChannel.name}}</option>
+                </sw-select-field>
+                
+                <sw-text-field :label="$t('wk-mp-config.label.headTitle')" v-model="config.headTitle"></sw-text-field>
+                <sw-switch-field :label="$t('wk-mp-config.label.displayBannerLabel')" v-model="config.displayBanner"></sw-switch-field>
+                {% block wk_landing_page_banner_media %}
+                    <sw-upload-listener
+                            :uploadTag="uploadTag"
+                            @media-upload-finish="setMediaItem"
+                            autoUpload>
+                    </sw-upload-listener>
+                    <sw-media-upload-v2 :uploadTag="uploadTag"
+                        :source="avatarMediaItem"
+                        :allowMultiSelect="false"
+                        variant="regular"
+                        :label="$tc('wk-mp-config.label.bannerImageTitle')"
+                        @media-drop="onDropMedia"
+                        @media-upload-remove-image="onUnlinkAvatar">
+                    
+                    </sw-media-upload-v2>
+                {% endblock %}
+                    <sw-text-editor :label="$t('wk-mp-config.label.bannerContentLabel')" v-model="config.bannerContent"></sw-text-editor>
+                    <sw-text-field :label="$t('wk-mp-config.label.pageLabel1')" v-model="config.pageLabel1"></sw-text-field>
+                    <sw-text-field :label="$t('wk-mp-config.label.pageLabel2')" v-model="config.pageLabel2"></sw-text-field>
+                    <sw-text-field :label="$t('wk-mp-config.label.pageLabel3')" v-model="config.pageLabel3"></sw-text-field>
+                    <sw-text-field :label="$t('wk-mp-config.label.pageLabel4')" v-model="config.pageLabel4"></sw-text-field>
+                    <sw-text-field :label="$t('wk-mp-config.label.landingPageButtonLabel')" v-model="config.buttonLabel" required></sw-text-field>
+                    <sw-switch-field :label="$t('wk-mp-config.label.displayIcon')" v-model="config.displayIcon"></sw-switch-field>
+                    <sw-upload-listener
+                            :uploadTag="feature1UploadTag"
+                            @media-upload-finish="setFeatureIcon1"
+                            autoUpload>
+                    </sw-upload-listener>
+                    <sw-media-compact-upload-v2 
+                    :uploadTag="feature1UploadTag"
+                    :source="feature1IconMedia"
+                    :label="$t('wk-mp-config.label.feature1IconMedia')" 
+                     @media-upload-remove-image="removeMedia1"
+                     @selection-change="setFeatureIcon1FromMediaLibrary">
+                    </sw-media-compact-upload-v2>
+                    <sw-text-field :label="$t('wk-mp-config.label.feature1IconLabel')" v-model="config.feature1Label"></sw-text-field>
+                    <sw-upload-listener
+                            :uploadTag="feature2UploadTag"
+                            @media-upload-finish="setFeatureIcon2"
+                            autoUpload>
+                    </sw-upload-listener>
+                    <sw-media-compact-upload-v2 
+                    :uploadTag="feature2UploadTag" 
+                    :source="feature2IconMedia"
+                    :label="$t('wk-mp-config.label.feature2IconMedia')" 
+                     @media-upload-remove-image="removeMedia2"
+                     @selection-change="setFeatureIcon2FromMediaLibrary">
+                    </sw-media-compact-upload-v2>
+                    <sw-text-field :label="$t('wk-mp-config.label.feature2IconLabel')" v-model="config.feature2Label"></sw-text-field>
+                    <sw-upload-listener
+                            :uploadTag="feature3UploadTag"
+                            @media-upload-finish="setFeatureIcon3"
+                            autoUpload>
+                    </sw-upload-listener>
+                    <sw-media-compact-upload-v2 
+                    :uploadTag="feature3UploadTag" 
+                    :source="feature3IconMedia"
+                    :label="$t('wk-mp-config.label.feature3IconMedia')" 
+                     @media-upload-remove-image="removeMedia3"
+                     @selection-change="setFeatureIcon3FromMediaLibrary">
+                    </sw-media-compact-upload-v2>
+                    <sw-text-field :label="$t('wk-mp-config.label.feature3IconLabel')" v-model="config.feature3Label"></sw-text-field>
+                    <sw-upload-listener
+                            :uploadTag="feature4UploadTag"
+                            @media-upload-finish="setFeatureIcon4"
+                            autoUpload>
+                    </sw-upload-listener>
+                    <sw-media-compact-upload-v2 
+                    :uploadTag="feature4UploadTag" 
+                    :source="feature4IconMedia"
+                    :label="$t('wk-mp-config.label.feature4IconMedia')" 
+                     @media-upload-remove-image="removeMedia4"
+                     @selection-change="setFeatureIcon4FromMediaLibrary">
+                    </sw-media-compact-upload-v2>
+                    <sw-text-field :label="$t('wk-mp-config.label.feature4IconLabel')" v-model="config.feature4Label"></sw-text-field>
+                    <sw-text-editor :label="$t('wk-mp-config.label.aboutMarketplaceLabel')" v-model="config.aboutMarketplace"></sw-text-editor>
+                    <sw-text-field :label="$t('wk-mp-config.label.sellerListingTopHeadingLabel')" v-model="config.sellerListingTopHeading"></sw-text-field>
+                    
+                
+            </sw-card>
+            <sw-card :title="$t('wk-mp-config.label.orderCardTitle')">
+                <sw-switch-field v-model="config.manageOrderStatus" :label="$t('wk-mp-config.label.manageOrderStatusLabel')"></sw-switch-field>
+                <sw-entity-multi-select  :label="$t('wk-mp-config.label.orderStatusLable')" :entityCollection="orderStateCollection" entity="state_machine_state" @change="setStateIds" :criteria="stateMachineCriteria"></sw-entity-multi-select>
+                {# <sw-entity-single-select :label="$t('wk-mp-config.label.completeOrderStatusLabel')"
+                    entity="state_machine_state" :criteria="stateMachineCriteria" v-model="config.completeStateId" :value="config.completeStateId">
+                </sw-entity-single-select>
+                <sw-entity-single-select :label="$t('wk-mp-config.label.cancelOrderStatusLabel')"
+                    entity="state_machine_state" :criteria="stateMachineCriteria" v-model="config.cancelStateId">
+                </sw-entity-single-select> #}
+            </sw-card>
+            
+        </sw-card-view>
+        
+    </template>
+    <template #sidebar>
+        <sw-sidebar>
+            <sw-sidebar-media-item ref="mediaSidebarItem">
+                <template #context-menu-items="media">
+                    <sw-context-menu-item @click="setMediaFromSidebar(media.mediaItem)">
+                       set as banner image
+                    </sw-context-menu-item>
+                    {# <sw-context-menu-item @click="setFeatureIcon1FromSidebar(media.mediaItem)">
+                       set as feature icon1
+                    </sw-context-menu-item> #}
+                </template>
+            </sw-sidebar-media-item>
+        </sw-sidebar>
+    </template>
+</sw-page>

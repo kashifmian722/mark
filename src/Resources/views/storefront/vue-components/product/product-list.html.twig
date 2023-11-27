@@ -1,0 +1,333 @@
+<template id="product-template">
+    <div class="product-container">
+        <div class="marketplace-products" v-if="productList">
+            <div class="account-welcome">
+                <div class="product-header-content">
+                    <h1>{{"wk-mp.product.header.title"|trans}}</h1>
+                    <p>{{"wk-mp.product.header.description"|trans}}</p>
+                </div>
+
+                <div class="form-action-buttons">
+                    <button type="button" title="{{"wk-mp.product.button.addProduct"|trans}}" class="btn btn-primary" @click="productList = false;">{{"wk-mp.product.button.addProduct"|trans}}</button>
+                </div>
+            </div>
+            <div class="well" style="padding:10px">
+                <form @submit.prevent="filterProduct">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label">{{"wk-mp.product.input-label.productName"|trans}}</label>
+                            <input type="text" class="form-control" v-model="productName" id="filterProductName">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{"wk-mp.product.input-label.status"|trans}}</label>
+                            <select class="custom-select" v-model="productStatus" id="filterStatus">
+                                <option value="1">{{"wk-mp.product.input-label.enable"|trans}}</option>
+                                <option value="0">{{"wk-mp.product.input-label.disable"|trans}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-sm" title="{{"wk-mp.product.button.filter"|trans}}" style="margin-top:22px;">{{"wk-mp.product.button.filter"|trans}}</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary btn-sm" title="{{"wk-mp.product.button.resetFilter"|trans}}" style="margin-top:22px; cursor:pointer; color: #FFFF" v-on:click="getProducts">{{"wk-mp.product.button.resetFilter"|trans}}</a>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+
+
+            <div class="account-products-main">
+                <div class="account-products-overview">
+                    <table class="table table-bordered">
+                        <thead>
+                            
+                            <div v-if="deleteStatus && checkedProduct.length">
+                                <span>Selected: ~checkedProduct.length~</span>&nbsp;&nbsp;
+                                <button class="btn btn-primary btn-sm" type="button" @click="deleteProduct(checkedProduct)" title="{{"wk-mp.product.button.delete"|trans}}">
+                                    <span class="product-view-btn-text" >{{"wk-mp.product.button.delete"|trans}}</span>
+                                </button>
+                            </div>
+                            <tr>
+                                <th v-if="deleteStatus" class="col" style="width:20px"><input type="checkbox"  @click="selectAll" v-model="allSelected" /></th>
+                                <th class="col">{{"wk-mp.product.list.name"|trans}}</th>
+                                <th class="col">{{"wk-mp.product.list.productNumber"|trans}}</th>
+                                <th class="col">{{"wk-mp.product.list.price"|trans}}</th>
+                                <th class="col">{{"wk-mp.product.list.active"|trans}}</th>
+                                <th class="col">{{"wk-mp.product.list.availabelStock"|trans}}</th>
+                                <th class="col last-table-head">{{"wk-mp.product.list.action"|trans}}</th>
+                            </tr>
+                            
+                        </thead>
+                        
+                        <tbody  data-product-detail-loader="true">
+                            
+                            <tr v-for="(product, index) in products" :key="index">
+                                <td v-if="deleteStatus">
+                                    <input type="checkbox" id="selectedProduct" v-bind:id="product.productId" v-bind:value="product.productId" v-model="checkedProduct" @click="singleSelect()" />
+                                    
+                                </td>
+                                <td>
+                                    <span class="product-item-value product-item-name-value">~product.name~</span>
+                                </td>
+
+                                <td >
+                                    <span class="product-item-value product-item-product-number">~product.productNumber~</span>
+                                </td>
+
+                                <td>
+                                    <span class="product-item-value product-item-price-value">~currency.symbol~~(currency.factor*product.price).toFixed(2)~</span>
+                                </td>
+
+                                <td>
+                                    <span class="is--active sw-icon icon--small-default-checkmark-line-medium sw-icon--fill sw-icon--small" v-if="product.active">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path fill="#758CA3" fill-rule="evenodd" d="M3.70710678,8.29289322 C3.31658249,7.90236893 2.68341751,7.90236893 2.29289322,8.29289322 C1.90236893,8.68341751 1.90236893,9.31658249 2.29289322,9.70710678 L5.29289322,12.7071068 C5.68341751,13.0976311 6.31658249,13.0976311 6.70710678,12.7071068 L13.7071068,5.70710678 C14.0976311,5.31658249 14.0976311,4.68341751 13.7071068,4.29289322 C13.3165825,3.90236893 12.6834175,3.90236893 12.2928932,4.29289322 L6,10.5857864 L3.70710678,8.29289322 Z"></path>
+                                        </svg>
+                                    </span>
+                                    {# <span v-else-if="!product.listingStatus">Expired</span> #}
+
+                                    <span v-else class="is--inactive sw-icon icon--small-default-checkmark-line-medium sw-icon--fill sw-icon--small">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                            <path fill="#758CA3" fill-rule="evenodd" d="M8,6.58578644 L11.2928932,3.29289322 C11.6834175,2.90236893 12.3165825,2.90236893 12.7071068,3.29289322 C13.0976311,3.68341751 13.0976311,4.31658249 12.7071068,4.70710678 L9.41421356,8 L12.7071068,11.2928932 C13.0976311,11.6834175 13.0976311,12.3165825 12.7071068,12.7071068 C12.3165825,13.0976311 11.6834175,13.0976311 11.2928932,12.7071068 L8,9.41421356 L4.70710678,12.7071068 C4.31658249,13.0976311 3.68341751,13.0976311 3.29289322,12.7071068 C2.90236893,12.3165825 2.90236893,11.6834175 3.29289322,11.2928932 L6.58578644,8 L3.29289322,4.70710678 C2.90236893,4.31658249 2.90236893,3.68341751 3.29289322,3.29289322 C3.68341751,2.90236893 4.31658249,2.90236893 4.70710678,3.29289322 L8,6.58578644 Z"></path>
+                                        </svg>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="product-item-value product-item-stock-value">~product.stock~</span>
+                                </td>
+
+                                <td class="col-md product-item product-item-actions">
+                                    
+                                    <div v-if="changeProductStatus">
+                                        <button type="submit" class="btn btn-primary" v-if="product.active" @click="changeStatus(product.productId, active = false)" title="{{"wk-mp.product.button.disableTitle"|trans}}">
+                                            {% sw_icon 'thumb-down' style { 'size': 'md','color': 'danger' } %}
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" v-else    @click="changeStatus(product.productId, active = true)"  title="enable">
+                                            {% sw_icon 'thumb-up' style { 'size': 'md', 'color': 'success' } %}
+                                        </button>
+                                    </div>
+                                    <button title="{{"wk-mp.product.button.edit"|trans}}" class="btn btn-light btn-sm product-hide-btn collapsed" type="button" @click="viewProduct(index,relist)" title="{{"wk-mp.product.button.disableTitle"|trans}}">
+                                        {% sw_icon 'preview'%}
+                                    </button>
+                                    <button v-if="membershipAddon" title="{{"wk-mp.product.button.relistTitle"|trans}}" type="submit" @click="viewProduct(index,relist = 1)" style="margin-right:5px"
+                                        class="btn btn-primary" :disabled="product.listingStatus">
+                                        {% sw_icon 'arrow-360-right' style { 'size': 'md', 'color': 'success' } %}
+                                    </button>
+
+                                </td>
+                            </tr>
+
+                            
+                            
+                        </tbody>
+                    </table>
+                    <div v-if="products && products.length <= 0" style="text-align:center">
+                        {{"wk-mp.product.list.notFound"|trans}}
+                    </div>
+                </div>
+            </div>
+            <paginate
+                v-if="pageCount && pageCount - 1"
+                v-model="page"
+                :page-count="pageCount"
+                :click-handler="paginate"
+                :prev-text="'Prev'"
+                :next-text="'Next'"
+                :container-class="'pagination'">
+            </paginate>
+        </div>
+
+        <product-view v-else-if="!productList" :product="product" :products="products" :relist="relist" :groupedproductaddon="groupedProductAddon" :currency="currency"></product-view>
+    </div>
+</template>
+<script type="text/javascript">
+    (() => {
+        Vue.use(VueRouter)
+        Vue.component('paginate', VuejsPaginate)
+        Vue.use(VueLoading);
+        Vue.component('loading', VueLoading);
+
+        const router = new VueRouter({
+        })
+
+        new Vue({
+            router,
+            el: '#app',
+            template: '#product-template',
+
+            data: function () {
+                return {
+                    'limit': 10,
+                    'product': {},
+                    'pageCount': 0,
+                    'products': null,
+                    'page': this.$route.query.page ? parseInt(this.$route.query.page) : 1,
+                    'productList': ("{{ productView }}" == 'list') ? true : false,
+                    'environment': '{{ environment }}',
+                    'deleteStatus': null,
+                    'changeProductStatus': null,
+                    'membershipAddon': null,
+                    'allSelected': false,
+                    'checkedProduct': [],
+                    'productName': null,
+                    'productStatus':  null,
+                    'relist': null,
+                    'active': null,
+                    'groupedProductAddon': null,
+                    'currency': null
+                }
+            },
+
+            mounted: function () {
+                this.getProducts();
+            },
+
+            watch: {
+                '$route.query.page': function (newValue, oldValue) {
+                    this.getProducts();
+                }
+            },
+
+            methods: {
+                selectAll: function () {
+                    this.checkedProduct = [];
+                    if(!this.allSelected) {
+                        for (product in this.products) {
+                            this.checkedProduct.push(this.products[product].productId)
+                        }
+                    }
+                },
+                singleSelect: function (productId) {
+                   
+                    if (this.checkedProduct.length === this.products.length) {
+                        this.allSelected = true;
+                    } else {
+                        this.allSelected = false;
+                    }
+
+                },
+                
+                filterProduct: function () {
+
+                   let url = `${window.baseUrl}/storefront-api/{{ context.customer.id}}/products?page=${this.page}&limit=${this.limit}&name=${this.productName}&status=${this.productStatus}`;
+
+
+                   axios.get(url)
+                   .then(response => {
+                       this.products = response.data.productsCollection;
+                        this.pageCount = Math.ceil(response.data.total / this.limit);
+                        
+                   })
+                   .catch(error => {
+                    })
+                },
+                getProducts: function () {
+                    let loader = this.$loading.show({
+                    loader: 'dots',
+                    color: '#cce3fb'
+                    });
+                    let url = `${window.baseUrl}/storefront-api/{{ context.customer.id }}/products?page=${this.page}&limit=${this.limit}`
+
+                    this.productName = null,
+                    this.productStatus = null
+
+                    axios.get(url)
+                    .then(response => {
+                        this.currency = response.data.currency;
+                        this.products = response.data.productsCollection;
+                        this.pageCount = Math.ceil(response.data.total / this.limit);
+                        this.deleteStatus = response.data.deleteStatus;
+                        this.changeProductStatus = response.data.changeProductStatus;
+                        this.membershipAddon = response.data.membershipAddon;
+                        this.groupedProductAddon = response.data.groupedProductAddon;
+                        loader.hide();
+                    })
+                    .catch(error => {
+                    })
+                    
+                },
+
+                deleteProduct: function (productId) {
+                    let url = "{{ path('frontend.marketplace.api.products', {customerId: context.customer.id})}}";
+                    
+                    axios.delete(url, { params: { productId }})
+                    .then(response => {
+                        this.getProducts();
+                        this.checkedProduct = [];
+                        this.allSelected = false;
+                        window.storefrontAlert({
+                            alertType: 'success',
+                            alertMessage: response.data.message,
+                        });
+                    })
+                    .catch(error => {
+                    })
+                },
+
+                viewProduct: function (productId,relist) {
+                    this.productList = false;
+                    this.product = this.products[productId];
+                    this.product.id = productId;
+                },
+
+                renderProductList: function () {
+                    this.relist = null;
+                    if (window.location.pathname.indexOf('add') > -1) {
+                        window.location.href = window.baseUrl + '/marketplace/products';
+                    } else {
+                        this.product = {};
+                        this.productList = true;
+                    }
+
+                },
+
+                setFormattedCategories: function (categories) {
+                    var formattedCategories = [];
+                    for(const category in categories) {
+                        if (categories[category].children == null) {                        
+                            categories[category]['children'] = [];
+                        }
+
+                        formattedCategories.push(categories[category])
+                    }
+
+                    return formattedCategories;
+                },
+
+                matchParentCategoryId: function (categoryCollection, parentId) {
+                    return categoryCollection.filter(formattedCategory => formattedCategory.id == parentId)
+                },
+
+                paginate: function () {
+                    this.$router.push({ query: { page: this.page }})
+                },
+                
+                changeStatus(id, active) {
+                    let url = "{{ path('frontend.marketplace.products.status')}}";
+                    
+                    axios.post(url, { params: { id, active }})
+                    .then(response => {
+                        this.getProducts();
+                        window.storefrontAlert({
+                            alertType: 'success',
+                            alertMessage: response.data.message,
+                        });
+                    window.scrollTo(0,0);
+                    })
+                    .catch(error => {
+                    })
+                 
+                }
+            },
+
+            created() {
+                document.title = 'Product List';
+            },
+
+            delimiters: ['~', '~']
+        })
+    })()
+
+</script>

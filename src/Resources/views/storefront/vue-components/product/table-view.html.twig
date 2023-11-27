@@ -1,0 +1,130 @@
+<style>
+    .table-wrapper {
+        width: 100%;
+    }
+    {# .row {
+        margin-bottom: 15px;
+    } #}
+    .small-button {
+        font-size: 10px;
+    }
+</style>
+
+
+<template id="table-view-template">
+    <div class="table-wrapper">
+        <div class="account-products-overview">
+            <div class="table order-table">
+                <div class="order-table-header">
+                    <div class="row">
+                        <div class="col" v-for="(heading, index) in tableHeadings" >~heading~</div>
+                    </div>
+                </div>
+                <div data-product-detail-loader="true" class="product-table-body">
+                    <div class="product-wrapper">
+                        <div class="product-item-header">
+                            <form class="row" v-for="(rowDetails, rowIteration) in tableValues" @submit.prevent="updateVariant($event, rowDetails.actionButton)">
+                                <div class="col-md" v-for="(value, index) in rowDetails">
+                                    <template v-if="['name'].includes(index)">
+                                        <span v-text="value"></span>
+                                    </template>
+
+                                    <template v-else-if="['price'].includes(index)">
+                                        <input type="number" step="0.1" :value="value" :name="index" class="form-control" />
+                                    </template>
+                                    <template v-else-if="['stock'].includes(index)">
+                                        <input type="number" step="1" :value="value" :name="index" class="form-control" pattern="^[0-9]" min="1" />
+                                    </template>
+
+                                    <template v-else-if="index == 'actionButton'">
+                                        <button type="submit" class="btn btn-light btn-sm small-button" name="submit" :value="value">{{"wk-mp.product.button.update"|trans}}</button>
+
+                                        <button type="button" class="btn btn-light btn-sm small-button" :value="value" @click="deleteVariant($event, value, rowIteration)">{{"wk-mp.product.button.delete"|trans}}</button>
+                                    </template>
+
+                                    <template v-else-if="['active'].includes(index)">
+                                        <span class="is--active sw-icon icon--small-default-checkmark-line-medium sw-icon--fill sw-icon--small" v-if="value">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                                    <path fill="#758CA3" fill-rule="evenodd" d="M3.70710678,8.29289322 C3.31658249,7.90236893 2.68341751,7.90236893 2.29289322,8.29289322 C1.90236893,8.68341751 1.90236893,9.31658249 2.29289322,9.70710678 L5.29289322,12.7071068 C5.68341751,13.0976311 6.31658249,13.0976311 6.70710678,12.7071068 L13.7071068,5.70710678 C14.0976311,5.31658249 14.0976311,4.68341751 13.7071068,4.29289322 C13.3165825,3.90236893 12.6834175,3.90236893 12.2928932,4.29289322 L6,10.5857864 L3.70710678,8.29289322 Z"></path>
+                                                </svg>
+                                            </span>
+
+                                            <span v-else class="is--inactive sw-icon icon--small-default-checkmark-line-medium sw-icon--fill sw-icon--small">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                                    <path fill="#758CA3" fill-rule="evenodd" d="M8,6.58578644 L11.2928932,3.29289322 C11.6834175,2.90236893 12.3165825,2.90236893 12.7071068,3.29289322 C13.0976311,3.68341751 13.0976311,4.31658249 12.7071068,4.70710678 L9.41421356,8 L12.7071068,11.2928932 C13.0976311,11.6834175 13.0976311,12.3165825 12.7071068,12.7071068 C12.3165825,13.0976311 11.6834175,13.0976311 11.2928932,12.7071068 L8,9.41421356 L4.70710678,12.7071068 C4.31658249,13.0976311 3.68341751,13.0976311 3.29289322,12.7071068 C2.90236893,12.3165825 2.90236893,11.6834175 3.29289322,11.2928932 L6.58578644,8 L3.29289322,4.70710678 C2.90236893,4.31658249 2.90236893,3.68341751 3.29289322,3.29289322 C3.68341751,2.90236893 4.31658249,2.90236893 4.70710678,3.29289322 L8,6.58578644 Z"></path>
+                                                </svg>
+                                            </span>
+                                    </template>
+
+                                    <template v-else>
+                                        <span>~value~</span>
+                                    </template>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script type="text/javascript">
+    Vue.component('table-view', {
+        props: ['tableHeadings', 'tableValues', 'updateUrl'],
+        template: '#table-view-template',
+        
+        methods: {
+            'updateVariant': function (event, variantId) {
+                event.preventDefault();
+                var submitButtonIndex = 3;
+                event.target[submitButtonIndex].disabled = "disabled";
+
+                let formData = new FormData(event.target);
+                formData.append('variantId', variantId);
+                formData.append('requestMethod', 'VARIANT');
+
+                axios({
+                    method: 'POST',
+                    data: formData,
+                    url: this.updateUrl,
+                }).then(response => {
+                    event.target[submitButtonIndex].disabled = "";
+
+                    window.storefrontAlert({
+                        alertType: 'success',
+                        alertMessage: '{{"wk-mp.successMessage.variantUpdateSuccess"|trans}}',
+                    });
+                    window.scrollTo(0,0);
+                }).catch(error => {
+                    
+                })
+            },
+
+            deleteVariant: function (event, variantId, index) {
+                event.target.disabled = "disabled";
+
+                axios({
+                    method: 'DELETE',
+                    url: `${this.updateUrl}?variantId=${variantId}`,
+                }).then(response => {
+                    event.target.disabled = "";
+
+                    if (response.data.status) {
+                        this.$root.product.variants.splice(index, 1);
+
+                        window.storefrontAlert({
+                            alertType: 'success',
+                            alertMessage: '{{"wk-mp.successMessage.variantDeleteSuccess"|trans}}',
+                        });
+                    }
+                }).catch(error => {
+                    
+                })
+            }
+        },
+
+        delimiters: ['~', '~'],
+    })
+</script>
+

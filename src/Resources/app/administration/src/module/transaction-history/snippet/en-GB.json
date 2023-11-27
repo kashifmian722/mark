@@ -1,0 +1,11 @@
+{
+    "mp-transaction-history":{
+        "general": {
+            "mainMenuItemList": "Marketplace Transaction History",
+            "descriptionTextModule": "Here find all transaction history of marketplace"
+        },
+        "list": {
+            "columnCollection": ["Customer Name", "Transaction Id", "Comment", "Transaction Amount", "Date"]
+        }
+    }
+}

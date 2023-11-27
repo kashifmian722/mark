@@ -1,0 +1,366 @@
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
+
+{% block page_account_main_content %}
+    <style>
+        i.mp-icon {
+            font-size: 25px;
+            user-select: none;
+            font-style: normal;
+        }
+        .mp-add-review {
+            float: right;
+            cursor: pointer;
+        }
+        .inline-block {
+            display: inline-block
+        }
+        .profile-image-preview {
+            width: 100px;
+            height: 100px;
+            margin-top: 20px;
+        }
+        .profile-image-preview img {
+            width: 100%;
+            height: 100%;
+        }
+        .rich-editor-wrapper {
+            margin-bottom: 90px;
+        }
+        .ql-toolbar {
+            border-radius: 5px 5px 0 0;
+        }
+        .ql-container {
+            border-radius: 0 0 5px 5px;
+        }
+        .form-error {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <div id="app"></div>
+
+    <template id="profile-form-template">
+        <div>
+
+            <div class="account-welcome">
+                <h1>{{"wk-mp.seller-profile.headerTitle"|trans}}</h1>
+                <p>{{"wk-mp.seller-profile.headerDescription"|trans}}</p>
+            </div>
+
+            <form class="marketplace-store-profile form-row" @submit.prevent="saveProfile">
+                <div class="col-md col-sm-12 form-action-buttons">
+                    <a :href="`${environment == 'dev' ? window.location.origin : window.baseUrl}/marketplace/seller/${profileDetails.storeSlug ? profileDetails.storeSlug : '{{ context.customer.id }}'}`" target="_blank">
+                        <button class="btn btn-primary" type="button" title="{{"wk-mp.seller-profile.viewProfileButton"|trans}}">
+                            <span class="order-view-btn-text" >{{"wk-mp.seller-profile.viewProfileButton"|trans}}</span>
+                        </button>
+                    </a>
+
+                    <button class="btn btn-primary profile-submit-btn" type="submit" title="{{"wk-mp.seller-profile.saveButton"|trans}}">
+                        <span class="order-view-btn-text" >{{"wk-mp.seller-profile.saveButton"|trans}}</span>
+                    </button>
+                </div>
+
+
+                <div class="form-group col-sm-12">
+
+                    <div class="form-error">
+                        <span class="error">~formError.images~</span>
+                    </div>
+
+                    <label class="form-label" for="store-logo">{{"wk-mp.seller-profile.storeLogo"|trans}}</label>
+                    <input type="file" v-on:change="handleStoreAttachmentChange('storeLogo')" ref="storeLogo" accept="image/png, image/jpeg, image/jpg" />
+                    <div class="profile-image-preview">
+
+                       <img :src="profileDetails.logoUrl" onerror="this.src=`${window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`" ref="storeLogoPreview" name="logo-image" />
+
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="store-banner">{{"wk-mp.seller-profile.storeBanner"|trans}}</label>
+                    <input type="file" v-on:change="handleStoreAttachmentChange('storeBanner')" ref="storeBanner" accept="image/png, image/jpeg, image/jpg" />
+                    <div class="profile-image-preview">
+                         <img :src="profileDetails.bannerUrl" onerror="this.src=`${window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`" ref="storeBannerPreview" />
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="store-owner">{{"wk-mp.seller-profile.storeOwner"|trans}}</label>
+                    <input type="file" v-on:change="handleStoreAttachmentChange('storeOwner')" ref="storeOwner" accept="image/png, image/jpeg, image/jpg" />
+                    <div class="profile-image-preview">
+                        <img :src="profileDetails.ownerUrl" onerror="this.src=`${window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`" ref="storeOwnerPreview" />
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="seller-description">{{"wk-mp.seller-profile.socialLink"|trans}}</label>
+
+                    <div class="col-sm-12" v-for="(socialLink, index) in profileDetails.socialSites">
+                        <div class="form-group col-sm-3 inline-block">
+                            <select class="form-control" :name=`socialSite[${index}][name]` required="required" v-model="socialLink.name">
+                                <option value="facebook">Facebook</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="insta">Instagram</option>
+                                <option value="youtube">Youtube</option>
+                                <option value="vimeo">Vimeo</option>
+                                <option value="pinterest">Pinterest</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-6 inline-block">
+                            <input class="form-control" placeholder="Social Site URL*" :name=`socialSite[${index}][url]`
+                                required="required" v-model="socialLink.url" />
+                        </div>
+                        <i class="mp-icon mp-add-review" id="open" @click="removeSocialLink(index)">&#8854;</i>
+                    </div>
+                    <i class="mp-icon mp-add-review" id="open" @click="addSocialLink">&#8853;</i>
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="seller-url">{{"wk-mp.seller-profile.storeSlug"|trans}}*</label>
+                    <input class="form-control" placeholder="{{"wk-mp.seller-profile.storeSlug"|trans}}" name="slug" v-model="storeSlug"
+                       @change="slugFormation" maxlength="50" required="required" />
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="seller-owner">{{"wk-mp.seller-profile.storeOwner"|trans}}*</label>
+                    <input class="form-control" placeholder="{{"wk-mp.seller-profile.storeOwner"|trans}}*" name="owner"
+                        required="required" v-model="profileDetails.storeOwner" maxlength="50" />
+                </div>
+
+                <div class="form-group col-sm-12">
+                    <label class="form-label" for="seller-title">{{"wk-mp.seller-profile.storeTitle"|trans}}*</label>
+                    <input class="form-control" placeholder="{{"wk-mp.seller-profile.storeTitle"|trans}}*" name="title"
+                        required="required" v-model="profileDetails.storeTitle" maxlength="255" />
+                </div>
+
+                <div class="form-group col-sm-12 rich-editor-wrapper">
+                    <label class="form-label" for="seller-description">{{"wk-mp.seller-profile.storeDescription"|trans}}</label>
+
+                    <div id="quill-editor">
+                        <p v-html="profileDetails.storeDescription"></p>
+                    </div>
+
+                    <span class="error">~formError.description~</span>
+                </div>
+            </form>
+        </div>
+    </template>
+
+
+    <script type="text/javascript">
+        (() => {
+            new Vue({
+                el: '#app',
+                template: `#profile-form-template`,
+
+                data: function () {
+                    return {
+                        storeSlug: '',
+                        storeLogo: '',
+                        formError: {},
+                        window: window,
+                        storeOwner: '',
+                        storeBanner: '',
+                        profileDetails: {},
+                        environment: '{{ environment }}',
+                        attachmentDirectoryPath: `${window.baseUrl}/mp-media/public-profile/{{ context.customer.id }}/`,
+                        allowedImageType: [
+                            'image/png',
+                            'image/jpg',
+                            'image/jpeg',
+                        ]
+                    }
+                },
+
+                beforeMount: function () {
+                    axios.get("{{ path('frontend.marketplace.api.profile', {customerId: context.customer.id}) }}")
+                    .then(response => {
+                        this.profileDetails = response.data.profile;
+                        if(this.profileDetails.logoUrl == null){
+                            this.profileDetails.logoUrl = this.attachmentDirectoryPath+'logo.png';
+                        }
+                        if(this.profileDetails.bannerUrl == null){
+                            this.profileDetails.bannerUrl = this.attachmentDirectoryPath+'banner.png';
+                        }
+                        if(this.profileDetails.ownerUrl == null){
+                            this.profileDetails.ownerUrl = this.attachmentDirectoryPath+'owner.png';
+                        }
+                        if (response.data.profile.storeSlug) {
+                            this.storeSlug = response.data.profile.storeSlug;
+                        }
+
+                        this.description.container.firstChild.innerHTML = response.data.profile.storeDescription ? response.data.profile.storeDescription : '';
+                    })
+                    .catch(error => {
+                        
+                    })
+                },
+
+                mounted: function () {
+                    this.description = new Quill('#quill-editor', {
+                        theme: 'snow'
+                    });
+                },
+
+                methods: {
+                    handleStoreAttachmentChange: function (changedReference) {
+                        this.$set(this.formError, 'images', '');
+
+                        let file = this.$refs[changedReference].files[0];
+                        if (this.allowedImageType.indexOf(file.type) <= -1){
+                            this.$set(this.formError, 'images', 'Invalid file uploaded.');
+                        }
+                        if (file.size > 1000000) {
+                            this.$set(this.formError, 'images', 'Image size must be less than 1 MB');
+                            
+                        }
+
+                        this.$refs[`${changedReference}Preview`].src = URL.createObjectURL(file);
+                        this[changedReference] = file;
+                    },
+
+                    saveProfile: function (event) {
+                        this.validate().then(valid => {
+                            if (valid) {
+                                var submitButton = event.target.querySelector('button.profile-submit-btn');
+                                submitButton.disabled = 'disabled';
+
+                                let data = new FormData(event.target);
+
+                                data.append("storeLogo", this.storeLogo);
+                                data.append("storeOwner", this.storeOwner);
+                                data.append("storeBanner", this.storeBanner);
+
+                                // set description from quill editor
+                                let description = this.description.container.firstChild.innerHTML;
+                                description = description.substring(description.indexOf('>') + 1, description.lastIndexOf('<'));
+
+                                data.append('description', description);
+
+                                let url = "{{ path('frontend.marketplace.api.profile', {customerId: context.customer.id}) }}";
+
+                                axios({url, data, method: 'POST'})
+                                .then(response => {
+                                    if (response.data.status) {
+                                        this.profileDetails.storeSlug = this.storeSlug;
+                                        window.storefrontAlert({alertType: 'success', alertMessage: '{{"wk-mp.successMessage.storeDetailsUpdatedMessage"|trans}}'})
+                                    } else {
+                                        window.storefrontAlert({
+                                            alertType: 'warning',
+                                            alertMessage: response.data.message,
+                                            timeout: "stay"
+                                        })
+                                    }
+
+                                    submitButton.disabled = false;
+                                })
+                            }
+                        })
+                    },
+
+                    addSocialLink: function () {
+                        this.profileDetails.socialSites.push({
+                            'name': '',
+                            'url': ''
+                        })
+                    },
+
+                    removeSocialLink: function (index) {
+                        this.profileDetails.socialSites.splice(index, 1);
+                    },
+
+                    slugFormation: function () {
+                        this.storeSlug = this.storeSlug.toLowerCase();
+                        this.storeSlug = this.storeSlug.replace(/ /g, "-");
+                    },
+
+                    validate: function () {
+                        return new Promise((resolve, reject) => {
+                            var isValid = true;
+
+                            let errors = Object.keys(this.formError).filter(key => {
+                                return (this.formError[key]) ? true : false;
+                            })
+
+                            if (errors.length) {
+                                isValid = false;
+                            }
+
+                            let invalidExtensions = ['php', 'zip', 'htaccess', 'json', 'xml', 'csv'];
+
+                            if (this.storeLogo.type) {
+                                isStoreLogoValidated = invalidExtensions.filter(extension => this.storeLogo.name.includes(extension));
+
+                                if (isStoreLogoValidated.length > 0) {
+                                    this.$set(this.formError, 'images', 'Invalid file for store logo.');
+
+                                    isValid = false;
+                                }
+                            }
+                            if (this.storeLogo.size > 1000000) {
+                                this.$set(this.formError, 'images', 'maximum size for image is 1 MB');
+
+                                    isValid = false;
+                            }
+
+                            if (this.storeOwner.type) {
+                                isStoreOwnerValidated = invalidExtensions.filter(extension => this.storeOwner.name.includes(extension));
+
+                                if (isStoreOwnerValidated.length > 0) {
+                                    this.$set(this.formError, 'images', 'Invalid file for store owner.');
+
+                                    isValid = false;
+                                }
+                            }
+                            if (this.storeOwner.size > 1000000) {
+                                this.$set(this.formError, 'images', 'maximum size for image is 1 MB');
+
+                                    isValid = false;
+                            }
+
+                            if (this.storeBanner.type) {
+                                isStoreBannerValidated = invalidExtensions.filter(extension => this.storeBanner.name.includes(extension));
+
+                                if (isStoreBannerValidated.length > 0) {
+                                    this.$set(this.formError, 'images', 'maximum size for image is 1 MB.');
+
+                                    isValid = false;
+                                }
+                            }
+                            if (this.storeBanner.size > 1000000) {
+                                this.$set(this.formError, 'images', 'maximum size for image is 1 MB.');
+
+                                    isValid = false;
+                            }
+                    
+                            // set description from quill editor
+                            {# let description = this.description.container.firstChild.innerHTML;
+                            description = description.substring(description.indexOf('>') + 1, description.lastIndexOf('<'));
+
+                            if (description == "<br>") {
+                                isValid = false;
+
+                                this.$set(this.formError, 'description', `Description is required.`);
+                            } else {
+                                this.$set(this.formError, 'description', '');
+                            } #}
+
+                            resolve(isValid);
+                        })
+                    },
+                    defaultImage(ref) {
+                        if (this.environment = 'dev') {
+                            this.$refs[ref].src = `${window.location.origin}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`;
+                        } else {
+                            this.$refs[ref].src = `${window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`;
+                        }
+                    } 
+                },
+
+                delimiters: ['~', '~']
+            })
+
+        })();
+    </script>
+{% endblock %}

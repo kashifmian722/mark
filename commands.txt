@@ -1,0 +1,16 @@
+git status;
+git add .;
+git checkout 1.0;
+
+git commit -m "misc. bug fixes";
+
+git checkout master;
+
+git merge 1.0;
+
+git push origin 1.0;
+
+git push origin master;
+
+git checkout 1.0;
+

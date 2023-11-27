@@ -1,0 +1,179 @@
+    <template id="seller-dashboard">
+        <div>   
+            <div class="marketplace-dashboard" v-if="dashboard">
+                <div class="dashboard-heading" style="font-size:20px; padding:10px">{{"wk-mp.dashboard.title"|trans}}</div>
+                <div class="row">
+                    <div class="col dashboard-block">
+                        <div class="upper-block" >
+                            <div class="icon">{% sw_icon 'stack-block' style { 'size': 'lg' } %} </div>
+                            <div> {{"wk-mp.dashboard.order"|trans}}</div>
+                        </div>
+                        <div class="bottom-block">
+                            <div class="percentage order">
+                                <span v-if="totalOrder">~todayOrder~</span>
+                                <span v-else>0</span>
+                            </div>
+                            <div> <a href="{{ path('frontend.marketplace.orders') }}" class="view-more-btn"> {{"wk-mp.dashboard.viewMore"|trans}} </a> </div> 
+                        </div>
+                    </div>
+                    <div class="col dashboard-block">
+                        <div class="sales-report" v-if="hover" style="position:fixed; background-color:wheat;padding:10px; top:90px">
+                            <p>{{"wk-mp.transaction.totalSale"|trans}}: ~currency.symbol~~(currency.factor*grossSale).toFixed(2)~<p>
+                            <p>{{"wk-mp.transaction.sellerIncome"|trans}}: ~currency.symbol~~(currency.factor*sellerIncome).toFixed(2)~<p>
+                            <p>{{"wk-mp.transaction.adminCommission"|trans}}: ~currency.symbol~~(currency.factor*adminCommission).toFixed(2)~<p>
+                        </div>
+                        <div class="upper-block" @mouseover="hover = true"  @mouseleave="hover = false" >
+                            <div class="icon">{% sw_icon 'chart-sales' style { 'size': 'lg' } %} </div>
+                            <div>{{"wk-mp.dashboard.turnover"|trans}}</div>
+                        </div>
+                        <div class="bottom-block">
+                            <div class="percentage sales">
+                                <span v-if="todayTurnover">~currency.symbol~~(currency.factor*todayTurnover).toFixed(2)~</span>
+                                <span v-else>0</span>    
+                            </div> 
+                            <div> <a href="#transaction-graph" class="view-more-btn" @click="viewTransaction"> {{"wk-mp.dashboard.viewMore"|trans}} </a> </div> 
+                        </div>
+                    </div>
+                    <div class="col dashboard-block">
+                        <div class="upper-block" >
+                            <div class="icon">{% sw_icon 'avatar-multiple' style { 'size': 'lg' } %} </div>
+                            <div>{{"wk-mp.dashboard.buyer"|trans}} </div>
+                        </div>
+                        <div class="bottom-block">
+                            <div class="percentage buyers">
+                                <span v-if="totalBuyer">~totalBuyer~</span>
+                                <span v-else>0</span>
+                            </div> 
+                            <div> <a href="{{ path('frontend.marketplace.orders') }}" class="view-more-btn"> {{"wk-mp.dashboard.viewMore"|trans}} </a> </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3  dashboard-block">
+                            <div class="upper-block" >
+                            <div class="icon">{% sw_icon 'sort-down' style { 'size': 'lg' } %} </div>
+                            <div>{{"wk-mp.dashboard.lowStock"|trans}} </div>
+                        </div>
+                        <div class="bottom-block">
+                            <div class="percentage buyers">
+                                <span v-if="lowStockProductNo">~lowStockProductNo~</span>
+                                <span v-else>0</span>    
+                            </div> 
+                            <div> <a href="{{ path('frontend.marketplace.products') }}" class="view-more-btn"> {{"wk-mp.dashboard.viewMore"|trans}} </a> </div> 
+                        </div>
+                    </div>
+                    <div class="col-9 col-md" style="margin-top:15px; margin-right:10px">
+                        <div class="order open"> {{"wk-mp.dashboard.orderOpen"|trans}}<span class="order-state">~orderOpen~/~totalOrder~</span></div>
+                        <div class="order completed">{{"wk-mp.dashboard.orderProcessing"|trans}}<span class="order-state">~orderProgress~/~totalOrder~</span></div>
+                        <div class="order processing">{{"wk-mp.dashboard.orderCompleted"|trans}} <span class="order-state">~orderCompleted~/~totalOrder~</span></div>
+                        <div class="order cancelled">{{"wk-mp.dashboard.orderCancelled"|trans}} <span class="order-state">~orderCanceled~/~totalOrder~</span> </div>
+                    </div>
+                </div>
+            
+            </div>
+            <div class="graph-chart" v-if="dashboard">
+                <h3 style="padding-top:15px">{{"wk-mp.dashboard.graphHeading"|trans}}</h3>
+                <div class="order-graph" style="padding:20px">
+                    <div class="graph-title"> {{"wk-mp.dashboard.orderGraph"|trans}} </div>
+                    <line-chart :data="orderGraphData"></line-chart>
+                </div>
+                <div class="sale-chart" id="transaction-graph" style="padding:20px">
+                    <div class="graph-title"> {{"wk-mp.dashboard.turnoverGraph"|trans}} </div>
+                    <area-chart v-if="currency" :prefix="currency.symbol" :data="saleGraphData"></area-chart>
+                </div>
+            </div>
+            <transcation-view v-else-if="!dashboard" ></transcation-view>
+            
+        </div>
+    </template>
+    
+  
+      
+   <script type="module">
+     
+        (() => {   
+            Vue.use(Chartkick.use(Chart));
+            Vue.use(VueRouter)
+            const router = new VueRouter({}) 
+            new Vue({
+                router,
+                el: '#app',
+                template: '#seller-dashboard',
+                data: function() {
+                    return {
+                        'todayOrder': 0,
+                        'totalOrder': 0,
+                        'grossSale': 0,
+                        'adminCommission': 0,
+                        'sellerIncome': 0,
+                        'totalBuyer' : 0,
+                        'lowStockProductNo': 0,
+                        'orderCompleted': 0,
+                        'orderOpen': 0,
+                        'orderProgress': 0,
+                        'orderCanceled': 0,
+                        'todayTurnover' :0,
+                        'currency': null,
+                        'hover': false,
+                        'dashboard': true,
+                        'orderGraphData': {},
+                        'saleGraphData': {},
+                    }
+                },
+                beforeMount: function () {
+                    this.getTodaySaleReport();
+                },
+                
+                methods: {
+                    getTodaySaleReport: function () {
+                        let url = `${window.baseUrl}/storefront-api/{{ context.customer.id }}/marketplace/report`;
+                       
+                        axios.get(url)
+                        .then(response => {
+                          this.todayOrder = response.data.totalOrder;
+                          this.grossSale = response.data.totalSale.totalGrossSales;
+                          this.adminCommission = response.data.totalSale.adminCommission;
+                          this.sellerIncome = response.data.totalSale.sellerIncome;
+                          this.todayTurnover = response.data.totalSale.todayTurnover;
+                          this.totalBuyer = response.data.totalBuyer;
+                          this.lowStockProductNo = response.data.lowStockProductNo;
+                            if (response.data.orderStatus.open) {
+                                this.orderOpen = response.data.orderStatus.open;
+                            }
+                            if (response.data.orderStatus.in_progress) {
+
+                            this.orderProgress = response.data.orderStatus.in_progress;
+                            }
+                            if(response.data.orderStatus.completed) {
+                            this.orderCompleted = response.data.orderStatus.completed;
+
+                            }
+                            if (response.data.orderStatus.cancelled) {
+                                this.orderCanceled = response.data.orderStatus.cancelled;
+                            }
+                            if (response.data.orderStatus.orderCount) {
+                            this.totalOrder = response.data.orderStatus.orderCount;
+
+                            }
+                          this.currency = response.data.currency;
+                          this.orderGraphData = response.data.orderGraph;
+                          this.saleGraphData = response.data.turnoverGraph;
+                          
+                           
+                        })
+                        .catch(error => {
+                        })
+                    },
+                   
+                    viewTransaction: function () {
+                        this.dashboard = false;
+                    },
+                    viewDashboard: function () {
+                        this.dashboard = true;
+                    }
+                },
+
+                delimiters: ['~', '~']
+            });
+        })()
+   </script>

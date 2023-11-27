@@ -1,0 +1,89 @@
+{% block mp_transaction_list %}
+    <sw-page class="mp-transaction-list">
+
+        {% block mp_transaction_list_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block mp_transaction_list_smart_bar_header_title %}
+                    <h2>
+                        {% block mp_transaction_list_smart_bar_header_title_text %}
+                            {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                            {{ $tc('mp-transaction.general.mainMenuItemListHeading') }}
+                        {% endblock %}
+
+                        
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+
+        <template slot="content">
+            {% block mp_transaction_list_content %}
+                <sw-entity-listing
+                    :isLoading="transactionListLoader"
+                    :items="marketplaceTransactionCollection"
+                    :repository="stateMachineRepository"
+                    :showSelection="false"
+                    :columns="columns"
+                    detailRoute="mp.transaction.detail">
+
+                    {# customer name #}
+                    <template slot="column-customerName" slot-scope="{ item }">
+                        <router-link :to="{ name: 'sw.customer.detail.base', params: { id: item.customer.id }  }">
+                            {{ item.customer.firstName }} {{ item.customer.lastName }}
+                        </router-link>
+                    </template>
+                    <template slot="column-totalAmount" slot-scope="{ item }">
+                        {{item.totalAmount.toFixed(2)|currency(item.currencyCode)}}
+                    </template>
+                    <template slot="column-adminAmount" slot-scope="{ item }">
+                        {{item.adminAmount.toFixed(2)|currency(item.currencyCode)}}
+                    </template>
+                    <template slot="column-sellerAmount" slot-scope="{ item }">
+                        {{item.sellerAmount.toFixed(2)|currency(item.currencyCode)}}
+                    </template>
+                    <template slot="column-paidAmount" slot-scope="{ item }">
+                        {{item.paidAmount.toFixed(2)|currency(item.currencyCode)}}
+                    </template>
+                    <template slot="column-remainingAmount" slot-scope="{ item }">
+                        {{item.remainingAmount.toFixed(2)|currency(item.currencyCode)}}
+                    </template>
+
+                    
+                    
+                   {# Disable delete button #}
+                    <template slot="actions" slot-scope="{ item }">
+                        {% block mp_transaction_list_grid_columns_actions_delete %}
+                            <sw-context-menu-item variant="danger" disabled>
+                                {# {{ $tc('sw-order.list.contextMenuDelete') }} #}
+                            </sw-context-menu-item>
+                        {% endblock %}
+                        {% block mp_transaction_list_grid_columns_actions_edit %}
+                        <sw-context-menu-item
+                        :routerLink="{ name: 'mp.transaction.detail', params: { id: item.id }  }"
+                        >
+                        {{ $tc('mp-transaction.list.contextMenuEdit') }}
+                        </sw-context-menu-item>
+                        {% endblock %}
+                    </template>
+                 <template slot="pagination">
+                        {% block wk_order_list_grid_pagination %}
+                            <sw-pagination 
+                                :page="page"
+                                :limit="limit"
+                                :total="total"
+                                :total-visible="7"
+                                @page-change="onPageChange">
+                            </sw-pagination>
+                        {% endblock %}
+                    </template>
+
+                    
+                </sw-entity-listing>
+
+                {# <sw-empty-state v-if="transactionListLoader && !total" :icon="$tc('mp-transaction.general.icon')" :title="$tc('mp-transaction.list.messageEmpty')" color="rgb(248, 137, 98)"></sw-empty-state> #}
+            {% endblock %}
+
+        </template>
+    </sw-page>
+{% endblock %}

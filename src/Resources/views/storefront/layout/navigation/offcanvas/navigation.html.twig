@@ -1,0 +1,8 @@
+{% sw_extends '@Storefront/storefront/layout/navigation/offcanvas/navigation.html.twig' %}
+
+{% block layout_navigation_offcanvas_navigation_action_language %}
+    {{ parent() }}
+    {% if config('WebkulMVMarketplace.config.status') %}
+    {% sw_include '@WebkulMVMarketplace/storefront/layout/header/actions/mp-header.html.twig' %}
+    {% endif %}
+{% endblock %}

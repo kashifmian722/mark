@@ -1,0 +1,34 @@
+{
+    "mp-order": {
+        "general": {
+            "orderIcon": "default-shopping-paper-bag",
+            "mainMenuItemList": "Marketplace Orders",
+            "descriptionTextModule": "Manage you marketplace orders here.",
+            "mainMenuItemListHeading": "Manage Seller's Orders"
+        },
+        "list": {
+            "columnCollection": ["Marketplace Product", "Quantity", "Total Amount", "Seller's Earnings", "Commission Amount", "Created At", "Status", "Order Number","Shipping Label"],
+            "messageEmpty": "No orders yet.",
+            "shippingLabel": "Shipping Label",
+            "downloadShippingLabelTitle": "Download Shipping Label",
+            "printShippingLabelTitle": "Print Shipping Label",
+            "paidLabel": "Paid",
+            "notPaidLabel": "Not Paid",
+            "shippingLabelSuccessMessage": "Shipping Label created Successfully",
+            "shippingLabelWarningMessage": "Shiping Label already created"
+        },
+        "detail": {
+            "columnProductName": "Item",
+            "columnItemStatus": "Status",
+            "cardTitle": "Marketplace Order Status",
+            "orderStatusPlaceholder": "Order Status",
+            "successTitle": "Success",
+            "successMessage": "Order status updated successfully!",
+            "cancelLabel": "Cancelled",
+            "titleSuccess": "Success",
+            "titleWarning": "Warning",
+            "titleError": "Error",
+            "messageSaveSuccess": "Payment Successfully Paid"
+        }
+    }
+}

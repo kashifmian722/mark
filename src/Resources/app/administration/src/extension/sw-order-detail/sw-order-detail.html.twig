@@ -1,0 +1,26 @@
+{% block sw_order_detail_content_tabs %}
+    {% parent %}
+    <sw-card :title="$t('mp-order.detail.cardTitle')" v-if="total > 0">
+        <sw-data-grid :dataSource="mpOrderHistory"
+                    :fullPage="false"
+                    :columns="getMpLineItemColumns"
+                    :showSelection="false"
+                    :showActions="false"
+                    :isLoading="isLoading"
+                    :allowColumnEdit="false"
+                     identifier="sw-order-detail"
+                    :showSettings="false">
+             <template #column-label="{ item}">
+                {{item.order_line_item.label}}
+             </template>
+             <template #column-status="{ item}">
+                <sw-select-field :value="item.orderStatus" :placeholder="item.state_machine_state.name" @change="updateMpStatus(item.id,$event)">
+                    <option v-for="status in orderOptions" :value="status.id">
+                        {{status.name}}
+                    </option>
+                </sw-select-field>
+             </template>
+              
+        </sw-data-grid>
+    </sw-card>
+{% endblock %}

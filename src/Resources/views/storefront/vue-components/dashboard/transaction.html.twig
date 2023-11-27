@@ -1,0 +1,136 @@
+
+<template id="transaction-detail">
+    
+    <div class="account-orders-main">
+        <button type="button" title="{{"wk-mp.product.button.cancel"|trans}}" class="btn btn-light btn-sm cancel-btn" @click="$root.viewDashboard" style="text-align:right">{{"wk-mp.product.button.cancel"|trans}}</button>
+        <div class="row wk-mp-tr-amount-wrapper">
+            <div class="col wk-mp-tr-amount-total">
+                <div class="wk-mp-tr-amount-total-title">
+                    <div class="wk-mp-tr-amount-total-title"></div>
+                    <div class="wk-mp-tr-txt-style">{{"wk-mp.transaction.statement"|trans}}</div>
+                    <div class="wk-mp-tr-amount-style">~currency.symbol~~(currency.factor*totalSellerIncome).toFixed(2)~</div>
+                    <div class="wk-mp-tr-last-style">{{"wk-mp.transaction.sellerEarning"|trans}}</div>
+                    {# <div class="wk-mp-tr-last-style"> (base currency)</div> #}
+                </div>
+                <div class="wk-mp-tr-amount-total-desc">
+                    <div> 
+                        <div class="wk-mp-tr-amount-style"> + ~currency.symbol~~(currency.factor*totalTransaction).toFixed(2)~ </div>
+                        <div class="wk-mp-tr-last-style"> {{"wk-mp.transaction.totalSale"|trans}}</div>
+                    </div>
+                    <div>
+                        <div class="wk-mp-tr-amount-style">- ~currency.symbol~~(currency.factor*totalAdminCommission).toFixed(2)~</div>
+                        <div class="wk-mp-tr-last-style">{{"wk-mp.transaction.commission"|trans}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col wk-mp-tr-payout-total">
+                <center>
+                    <div class="wk-mp-tr-txt-style">{{"wk-mp.transaction.payout"|trans}}</div>
+                    <div class="wk-mp-tr-amount-style">~currency.symbol~~(currency.factor*totalPaidTransaction).toFixed(2)~</div>
+                    <div class="wk-mp-tr-last-style">{{"wk-mp.transaction.totalPayout"|trans}}</div>
+                    {# <div class="wk-mp-tr-last-style"> (base currency)</div> #}
+                </center>
+            </div>
+            <div class="col wk-mp-tr-remain-total">
+                <div class="wk-mp-tr-remain-title"><div class="wk-mp-tr-txt-style">{{"wk-mp.transaction.withdrawal"|trans}}</div>
+                <div class="wk-mp-tr-amount-style">~currency.symbol~~(currency.factor*remainingTransaction).toFixed(2)~</div>
+                <div class="wk-mp-tr-amount-style"></div><div class="wk-mp-tr-last-style">{{"wk-mp.transaction.remainingPayout"|trans}}</div></div>
+            </div>
+        </div> 
+            <div style="overflow-x:auto;">
+                <table>
+                    <tr>
+                        <th class="col">{{"wk-mp.transaction.orderNumber"|trans}}</th>
+                        <th class="col">{{"wk-mp.transaction.comment"|trans}}</th>
+                        <th class="col">{{"wk-mp.transaction.totalAmount"|trans}}</th>
+                        <th class="col"> {{"wk-mp.transaction.earning"|trans}}</th>
+                        <th class="col">{{"wk-mp.transaction.commission"|trans}}</th>
+                        <th class="col">{{"wk-mp.transaction.status"|trans}} </th>
+                         <th class="col">{{"wk-mp.transaction.transactionId"|trans}}</th>
+                        <th class="col">Date</th>
+                    </tr>
+                
+                    <tr v-for="(transaction) in transactions">
+                        <td class="col-12 col-md order-item">  <span class="order-item-value"> ~transaction.marketplace_order.order.orderNumber~</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value" v-if="transaction.transactionComment">~transaction.transactionComment~</span><span v-else>N/A</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value">~currency.symbol~~(currency.factor*transaction.marketplace_order.order.positionPrice).toFixed(2)~</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value">~currency.symbol~~(currency.factor*transaction.sellerEarning).toFixed(2)~</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value">~currency.symbol~~(currency.factor*transaction.commissionAmount).toFixed(2)~</span></td>
+                        <td class="col-12 col-md order-item" v-if="transaction.isPaid"> <span class="order-item-value">{{"wk-mp.transaction.paid"|trans}}</span></td>
+                        <td class="col-12 col-md order-item" v-else> <span class="order-item-value">{{"wk-mp.transaction.unpaid"|trans}}</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value" v-if="transaction.transactionId">~transaction.transactionId~</span><span v-else>N/A</span></td>
+                        <td class="col-12 col-md order-item"> <span class="order-item-value" v-if="transaction.updatedAt">~transaction.updatedAt|formatDate~</span><span v-else>N/A</span></td>
+                    </tr>
+                </table>
+            </div>
+                <div v-if="transactions.length <= 0">{{"wk-mp.transaction.emptyTransactionFound"|trans}}</div>
+            <paginate
+                v-if="pageCount && (pageCount - 1)"
+                v-model="page"
+                :page-count="pageCount"
+                :click-handler="paginate"
+                :prev-text="'Prev'"
+                :next-text="'Next'"
+                :container-class="'pagination'">
+            </paginate>
+        </div>
+    </div>
+</template>
+
+<script type="text/javascript">
+   
+    Vue.component('paginate', VuejsPaginate)
+    Vue.filter('formatDate', function(value) {
+        if (value) {
+            return moment(String(value)).format('MM/DD/YYYY')
+        }
+    });
+    Vue.component('transcation-view', {
+        template: '#transaction-detail',
+        data: function() {
+            return {
+                'pageCount': 0,
+                'limit': 10,
+                'page': this.$route.query.page ? parseInt(this.$route.query.page) : 1,
+                'transactions': {},
+                'totalTransaction': 0,
+                'totalSellerIncome': 0,
+                'totalAdminCommission': 0,
+                'totalPaidTransaction': 0,
+                'remainingTransaction': 0,
+                'currency': null,
+            }
+        },
+       
+        beforeMount: function () {
+            this.getTransactionDetail();
+        },
+        watch: {
+            '$route.query.page': function () {
+                this.getTransactionDetail();
+            }
+        },
+        methods:{
+            getTransactionDetail: function () {
+                    let url = `${window.baseUrl}/storefront-api/{{context.customer.id}}/seller/transaction?page=${this.page}&limit=${this.limit}`;
+                    axios.get(url).then(response => {
+                        this.pageCount = Math.ceil(response.data.total/ this.limit);
+                        this.transactions = response.data.transactions;
+                        this.totalTransaction = response.data.totalTransaction;
+                        this.totalSellerIncome = response.data.sellerIncome;
+                        this.totalAdminCommission = response.data.adminCommission;
+                        this.totalPaidTransaction = response.data.paidTransaction;
+                        this.remainingTransaction = this.totalSellerIncome - this.totalPaidTransaction;
+                        this.currency = response.data.currency;
+                        
+
+                    })
+                },
+            paginate: function () {
+                    this.$router.push({ query: { page: this.page }})
+                }
+            
+        },
+        delimiters: ['~', '~']
+    });
+</script>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Marketplace Configuration</title>
+        <title lang="de-DE">Marktplatzkonfiguration</title>
+        <input-field type="bool">
+            <name>status</name>
+            <label>Marketplace status</label>
+            <label lang="de-DE">Marktplatzstatus</label>
+        </input-field>
+        <input-field type="bool">
+            <name>sellerAutoApprove</name>
+            <label>Auto Approve Sellers</label>
+            <label lang="de-DE">Verkäufer automatisch genehmigen</label>
+        </input-field>
+        <input-field type="bool">
+            <name>profileAutoApprove</name>
+            <label>Auto Approve Profile</label>
+            <label lang="de-DE">Profil automatisch genehmigen</label>
+        </input-field>
+
+        <input-field type="bool">
+            <name>allowChangeProductStatus</name>
+            <label>Allow to sellers change thier product status</label>
+            <label lang="de-DE">Verkäufern erlauben, ihren Produktstatus zu ändern</label>
+        </input-field>
+
+        <input-field type="bool">
+            <name>productAutoApprove</name>
+            <label>Auto Approve Products</label>
+            <label lang="de-DE">Produkte automatisch genehmigen</label>
+        </input-field>
+        <input-field type="bool">
+            <name>isLowStockNotify</name>
+            <label>Low Stock Notification</label>
+            <label lang="de-DE">Benachrichtigung bei niedrigem Lagerbestand</label>
+            <helpText>Sending mail to seller when products at low stock</helpText>
+            <helpText lang="de-DE">Senden von E-Mails an den Verkäufer, wenn Produkte auf Lager sind</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>lowStockCount</name>
+            <label>Low Stock Quantity</label>
+            <label lang="de-DE">Geringe Lagermenge</label>
+            <helpText>Sending Mail to seller for low stock products below given Quantity</helpText>
+            <helpText lang="de-DE">Senden einer E-Mail an den Verkäufer für Produkte mit niedrigem Lagerbestand unter der angegebenen Menge</helpText>
+        </input-field>
+
+        <input-field type="float">
+            <name>commission</name>
+            <label>Commission</label>
+            <label lang="de-DE">Kommission</label>
+            <placeholder>Enter your commission percentage</placeholder>
+            <placeholder lang="de-DE">Geben Sie Ihren Provisionsprozentsatz ein</placeholder>
+        </input-field>
+        <input-field type="bool">
+            <name>commissionOnTax</name>
+            <label>Calculate commission on tax</label>
+            <label lang="de-DE">Steuerprovision berechnen</label>
+            <helpText>If it is enabled then admin commission will be calculated with tax price(Gross Price) otherwise it will be calculated on product unit price</helpText>
+             <helpText lang="de-DE">Wenn es aktiviert ist, wird die Admin-Provision mit dem Steuerpreis (Bruttopreis) berechnet, andernfalls wird sie auf dem Produkteinheitspreis berechnet</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>deleteOption</name>
+            <label lang="en-EN">Seller Product Delete Option</label>
+            <label lang="de-DE">Option zum Löschen des Verkäuferprodukts</label>
+        </input-field>
+        
+    </card>
+
+</config>

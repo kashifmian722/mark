@@ -1,0 +1,18 @@
+<sw-page>
+    <template #smart-bar-actions>
+        <sw-button :routerLink="{name: 'mp.product.list'}">{{ $tc('mp-product.detail.cancelButtonText') }}</sw-button>
+        <sw-button @click="onClickSave">{{ $tc('mp-product.detail.saveButtonText') }}</sw-button>
+    </template>
+    <template slot="content">
+        <sw-card >
+            <sw-entity-multi-select :label="$t('mp-product.detail.selectProductLabel')" :entityCollection="productCollection" entity="product" @change="setProductIds" :criteria="productCriteria">
+            </sw-entity-multi-select>
+            <sw-select-field :label="$t('mp-product.detail.selectSellerLabel')" :placeholder="$t('mp-product.detail.selectSellerPlacehoder')" v-model="sellerId">
+                <option :value="seller.id" v-for="seller in sellerCollection">
+                    {{seller.sellerName}}
+                </option>
+            </sw-select-field>
+        </sw-card>
+    </template>
+
+</sw-page>

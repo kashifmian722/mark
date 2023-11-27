@@ -1,0 +1,45 @@
+{
+    "name": "webkul/multi-vendor-marketplace",
+    "description": "Multi Vendor Marketplace",
+    "version": "1.2.2",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Webkul Software Pvt. Ltd.",
+            "homepage": "https://webkul.com",
+            "role": "Manufacturer"
+        }
+    ],
+    "require": {
+        "shopware/core": "*",
+        "shopware/administration": "*",
+        "shopware/storefront": "*"
+    },
+    "type": "shopware-platform-plugin",
+    "autoload": {
+        "psr-4": {
+            "Webkul\\MultiVendor\\": "src/"
+        }
+    },
+    "extra": {
+        "shopware-plugin-class": "Webkul\\MultiVendor\\WebkulMVMarketplace",
+        "copyright": "(c) by webkul",
+        "plugin-icon": "src/Resources/config/plugin.png",
+        "label": {
+            "en-GB": "Multi Vendor Marketplace",
+            "de-DE": "Marktplatz für mehrere Anbieter"
+        },
+        "description": {
+            "de-DE": "Dieses Plugin ermöglicht es dem Benutzer, Verkäufer im Admin Store zu werden und sein Produkt zu verkaufen",
+            "en-GB": "This plugin allows the user to become a seller on admin store and sell their product."
+        },
+        "manufacturerLink": {
+            "de-DE": "https://store.webkul.com/shopware-multi-seller-marketplace.html",
+            "en-GB": "https://store.webkul.com/shopware-multi-seller-marketplace.html"
+        },
+        "supportLink": {
+            "de-DE": "https://store.webkul.com/support.html",
+            "en-GB": "https://store.webkul.com/support.html"
+        }
+    }
+}

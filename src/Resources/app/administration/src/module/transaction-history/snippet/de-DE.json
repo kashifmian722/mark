@@ -1,0 +1,11 @@
+{
+    "mp-transaction-history":{
+        "general": {
+            "mainMenuItemList": "Marktplatze Verlauf der Transaktionen",
+            "descriptionTextModule": "Hier finden Sie alle Transaktionshistorie des Marktplatzes"
+        },
+        "list": {
+            "columnCollection": ["Kundenname", "Transaktions-ID", "Kommentar", "Transaktionshöhe", "Datum"]
+        }
+    }
+}

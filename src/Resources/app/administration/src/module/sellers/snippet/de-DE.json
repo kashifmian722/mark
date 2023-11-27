@@ -1,0 +1,48 @@
+{
+    "mp-seller": {
+        "general": {
+            "icon": "default-avatar-multiple",
+            "mainMenuItemGeneral": "Marktplatz",
+            "descriptionTextModule": "Verwalten Sie hier Marktplatzverkäufer.",
+            "mainMenuItemList": "Marktplatz Verkäuferinnen",
+            "mainMenuItemListHeading": "Verkäufer verwalten"
+        },
+        "list": {
+            "messageEmpty": "Noch keine Verkäufer.",
+            "columnCollection": ["Name", "Email", "Wird angewendet", "Ist genehmigt", "Bestellungen insgesamt", "Hergestellt in", "Verkäufertyp", "Kommission %","Verwaltungseinkommen", "Verkäufereinkommen"],
+            "titleSaveSuccess": "Erfolg",
+            "messageSaveSuccess": "Verkäufer wurde aktualisiert.",
+            "titleSaveError": "Error",
+            "textTypeClient": "Privatkunde",
+            "textTypeCompany": " Unternehmen",
+            "messageSaveError": "Leider ist etwas schief gelaufen.",
+            "approveSellerSuccessMessage": "Verkäufer erfolgreich genehmigt!",
+            "disapproveSellerMessage": "Verkäufer ablehnen erfolgreich!",
+            "addSellerButtonLabel": "Verkäufer hinzufügen"
+        },
+        "detail": {
+            "emailLabel": "E-Mail",
+            "isAppliedLabel": "Wird angewandt",
+            "isApprovedLabel": "Ist genehmigt",
+            "appliedText": "Angewandt",
+            "notAppliedText": "Nicht angewandt",
+            "approvedText": "Genehmigt",
+            "notApprovedText": "Nicht bestätigt",
+            "errorTitle": "Fehler beim Speichern des Verkäufers",
+            "cancelButtonText": "Stornieren",
+            "saveButtonText": "sparen",
+            "commissionLabel": "Kommissionsrate",
+            "storelogoLabel": "Logo speichern",
+            "bannerlogoLabel": "Banner Logo",
+            "ownerlogoLabel": "Besitzer Logo",
+            "storeSlugLabel": "Gewünschtes URL-Segment",
+            "storeOwnerLabel": "Ladenbesitzer",
+            "storeTitleLabel": "Titel speichern",
+            "storeDescriptionLabel": "Geschäftsbeschreibung",
+            "profileStatusLabel": "Profilstatus",
+            "sellerStatusLabel": "Verkäuferstatus",
+            "successTitle": "Erfolg",
+            "SuccessMessage": "Verkäufer erfolgreich hinzugefügt"
+        }
+    }
+}

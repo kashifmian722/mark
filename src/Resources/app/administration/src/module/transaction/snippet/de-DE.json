@@ -1,0 +1,22 @@
+{
+    "mp-transaction":{
+        "general":{
+            "mainMenuItemList": "Marktplatz Transaktion",
+            "descriptionTextModule": "Verwalten Sie hier die Marktplatztransaktion",
+            "mainMenuItemGeneral": "Marktplatz",
+            "mainMenuItemListHeading": "Transaktion verwalten"
+        },
+        "list":{
+            "selectOption": ["Bezahlt, Unbezahlt"],
+            "selectStatusPlacholder": "Zahlungsstatus",
+            "contextMenuEdit": "bearbeiten",
+            "columnCollection": ["Kundenname", "Kunden-eMail", "Gesamtbestellung", "Gesamtmenge", "Verwaltungseinkommen", "Verkäufereinkommen","An den Verkäufer bezahlt", "Restbetrag", "Aktion"]
+        },
+        "detail":{
+            "payLinkText": "Bezahlen Sie an den Verkäufer",
+            "transactionModalTitle": "Bezahlen Sie an den Verkäufer",
+            "titleSaveSuccess": "speichern",
+            "messageSaveSuccess": "Transaktion erfolgreich abgeschlossen"
+        }
+    }
+    }

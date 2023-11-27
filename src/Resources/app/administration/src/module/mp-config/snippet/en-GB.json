@@ -1,0 +1,36 @@
+{
+    "wk-mp-config": {
+        "label": {
+            "smartBarHeading": "Marketplace Landing Page Configuration",
+            "saveButtonText": "Save",
+            "headTitle": "Marketplace Landing Page Head Title",
+            "bannerImageTitle": "Banner Image",
+            "displayBannerLabel": "Display Banner",
+            "bannerContentLabel": "Banner Content",
+            "pageLabel1": "Marketplace Landing Page Label1",
+            "pageLabel2": "Marketplace Landing Page Label2",
+            "pageLabel3": "Marketplace Landing Page Label3",
+            "pageLabel4": "Marketplace Landing Page Label4",
+            "landingPageButtonLabel": "Marketplace Landing Page Button Label",
+            "displayIcon": "Display Icon",
+            "feature1IconMedia": "Feature:1 Icon",
+            "feature2IconMedia": "Feature:2 Icon",
+            "feature3IconMedia": "Feature:3 Icon",
+            "feature4IconMedia": "Feature:4 Icon",
+            "feature1IconLabel": "Feature:1 Icon Label",
+            "feature2IconLabel": "Feature:2 Icon Label",
+            "feature3IconLabel": "Feature:3 Icon Label",
+            "feature4IconLabel": "Feature:4 Icon Label",
+            "aboutMarketplaceLabel": "About Marketplace",
+            "salesChannelLabel": "SalesChannel",
+            "orderCardTitle": "Order Settings",
+            "manageOrderStatusLabel": "Manage Order Status",
+            "orderStatusLable": "Order Status For Sellers",
+            "completeOrderStatusLabel": "Complete Order Status",
+            "cancelOrderStatusLabel": "Cancel Order Status",
+            "successTitle": "Success",
+            "successMessage": "Settings Saved Successfully",
+            "sellerListingTopHeadingLabel": "Seller listing top heading"
+        }
+    }
+}

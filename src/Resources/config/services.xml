@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+		<service id="Webkul\MultiVendor\Core\Content\Bundle\ProductDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_product" />
+        </service>
+       
+
+		<service id="Webkul\MultiVendor\Core\Content\Bundle\SellerDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_seller" />
+        </service>
+
+		<service id="Webkul\MultiVendor\Core\Content\Bundle\MpOrderDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_order" />
+        </service>
+       
+
+		<service id="Webkul\MultiVendor\Core\Content\Bundle\ReviewDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_review" />
+        </service>
+
+		<service id="Webkul\MultiVendor\Core\Content\Bundle\CommissionDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_commission" />
+        </service>
+        <service id="Webkul\MultiVendor\Core\Content\Bundle\MailTemplateDefinition">
+            <tag name="shopware.entity.definition" entity="marketplace_email_template" />
+        </service>
+
+        <service id="Webkul\MultiVendor\Controller\Storefront\MarketplaceStronefront" public="true">
+            <tag name="controller.service_arguments" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="Shopware\Storefront\Page\Navigation\NavigationPageLoader"/>
+        </service>
+
+        <service id="Webkul\MultiVendor\Controller\Storefront\MarketplaceAPI" public="true">
+            <tag name="controller.service_arguments" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="Webkul\MultiVendor\Controller\Administration\MarketplaceBackend" public="true">
+            <tag name="controller.service_arguments" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+        </service>
+
+        <service id="Webkul\MultiVendor\Controller\Storefront\MarketplaceStorefrontAPI" public="true">
+            <tag name="controller.service_arguments" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="marketplace_seller.repository"/>
+            <argument type="service" id="marketplace_product.repository"/>
+            <argument type="service" id="Shopware\Core\Content\Category\SalesChannel\CategoryListRoute"/>
+        </service>
+
+		<service id="storefront.helper" class="Webkul\MultiVendor\Services\StorefrontHelper" public="true">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="Shopware\Core\Content\Media\File\FileSaver" />
+            <argument type="service" id="Shopware\Core\Content\Media\File\FileNameProvider" />
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailService" />
+        </service>
+
+        <service id="mpmail.helper" class="Webkul\MultiVendor\Services\MarketplaceMailService" public="true">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="Shopware\Core\Content\Mail\Service\MailService" />
+        </service>
+
+		<service id="shopware.product.helper" class="Webkul\MultiVendor\Modules\ShopwareProductHelper" public="true">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="profile.helper" class="Webkul\MultiVendor\Services\StoreProfileHelper" public="true">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="Shopware\Core\Content\Product\SalesChannel\ProductListRoute" />
+        </service>
+
+		<service id="marketplace.data.format" class="Webkul\MultiVendor\Services\MarketplaceDataFormat" public="true">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="Webkul\MultiVendor\EventSubscriber\ShopwareSubscriber">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="Webkul\MultiVendor\EventSubscriber\ProductSubscriber">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="service_container" />
+        </service>
+         <service id="Webkul\MultiVendor\Resources\snippet\en_GB\SnippetFile_en_GB" public="true">
+            <tag name="shopware.snippet.file"  priority="100"/>
+        </service>
+        <service id="Webkul\MultiVendor\Resources\snippet\de_DE\SnippetFile_de_DE" public="true">
+            <tag name="shopware.snippet.file"  priority="100"/>
+        </service>
+    </services>
+</container>

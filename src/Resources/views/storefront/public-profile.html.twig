@@ -1,0 +1,477 @@
+{% sw_extends '@Storefront/storefront/page/content/index.html.twig' %}
+
+{% block base_main_inner %}
+    {% include '@WebkulMVMarketplace/storefront/vue-components/public-profile/add-review.html.twig' %}
+    {% include '@WebkulMVMarketplace/storefront/vue-components/public-profile/style.html.twig' %}
+    <div class="profile-container">
+            <div class="banner-container">
+                <img src="{{profileDetails.profile.bannerUrl}}" onerror="this.src=`${'{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`" />
+            </div>
+            <div class="profile-center-container">
+                <div class="shop-details">
+                    <div class="shop-icon">
+                        <img src="{{profileDetails.profile.logoUrl}}" onerror="this.src=`${'{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`"/>
+                    </div>
+                    <div class="shop-title">
+                        <span>{{profileDetails.profile.storeTitle}}</span>
+                        {% for socialLink in profileDetails.profile.socialSites %}
+                            {% if socialLink.name == "facebook" %}
+                            <a href="{{socialLink.url}}" target="_blank" class="fa fa-facebook"></a>
+                            {% elseif socialLink.name == "twitter" %}
+                                <a href="{{socialLink.url}}" target="_blank" class="fa fa-twitter" ></a>
+                            {% elseif socialLink.name == "insta" %}
+                                <a href="{{socialLink.url}}" target="_blank" class="fa fa-instagram" ></a>
+                            {% elseif socialLink.name == "youtube" %}
+                                <a href="{{socialLink.url}}" target="_blank" class="fa fa-youtube" ></a>
+                            {% elseif socialLink.name == "vimeo" %}
+                                <a href="{{socialLink.url}}" target="_blank" class="fa fa-vimeo" ></a>
+                            {% elseif socialLink.name == "pinterest" %}
+                                <a href="{{socialLink.url}}" target="_blank" class="fa fa-pinterest" ></a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="shop-owner-details">
+                    <div class="shop-owner-icon">
+                        <font>
+                            {{"wk-mp.public-profile.shopOwner"|trans}}
+                        </font>
+                        <img src="{{profileDetails.profile.ownerUrl}}" onerror="this.src=`${'{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`"/>
+                        <font style="font-size:20px;">
+                        {{profileDetails.profile.storeOwner}}
+                        </font>
+                    </div>
+                    
+                </div>
+            </div>
+        
+        <div class="profile-tab-container">
+            <button class="tablink" onclick="openPage('about', this)" id="defaultOpen">{{"wk-mp.public-profile.about"|trans}}</button>
+            <button class="tablink" onclick="openPage('product', this)" >{{"wk-mp.public-profile.product"|trans}}</button>
+            <button class="tablink" onclick="openPage('reviews', this)">{{"wk-mp.public-profile.reviews"|trans}}</button>
+            <button class="tablink" onclick="openPage('contact', this)">{{"wk-mp.public-profile.contact"|trans}}</button>
+
+        </div>
+            <div id="about" class="tabcontent">
+                <div style="font-size:17px;">{% if profileDetails.profile.storeDescription %}{{profileDetails.profile.storeDescription|raw}}{% else %}{{"wk-mp.public-profile.descriptionMessage"|trans}}{% endif %}</div>
+            </div>
+
+            <div id="product" class="tabcontent">
+                {% if profileDetails.sellerProducts|length >0 %}
+                    <div class="row cms-listing-row js-listing-wrapper">
+                        {% for product in profileDetails.sellerProducts %}
+                            {% set cover = product.cover.media %}
+                            {% set id = product.id %}
+                            {% set variation = product.variation %}
+                            {% set cheapest = product.calculatedCheapestPrice %}
+
+                            {% set real = product.calculatedPrice %}
+                            {% if product.calculatedPrices.count > 0 %}
+                                {% set real = product.calculatedPrices.last %}
+                            {% endif %}
+
+                            {% set displayFrom = product.calculatedPrices.count > 1 %}
+                            <div class="cms-listing-col col-sm-4 col-lg-3 col-xl-2" style="padding:20px">
+                                <div class="card product-box box-standard">
+                                    <div class="card-body">
+                                        <div class="product-image-wrapper" v-if="product.media && product.media.length > 0">
+                                            <a href="{{ seoUrl('frontend.detail.page', {'productId': product.id}) }}"
+                                                class="product-image-link is-standard">
+                                                {% if cover.url %}
+                                                {% sw_thumbnails 'product-image-thumbnails' with {
+                                                    media: cover,
+                                                    sizes: {
+                                                        'xs': '501px',
+                                                        'sm': '315px',
+                                                        'md': '427px',
+                                                        'lg': '333px',
+                                                        'xl': '284px'
+                                                    }
+                                                } %}
+                                                {% else %}
+                                                    <div class="product-image-placeholder">
+                                                        {% sw_icon 'placeholder' style {
+                                                            'size': 'fluid'
+                                                        } %}
+                                                    </div>
+                                                {% endif %}
+                                            </a>
+                                            
+                                        </div>
+
+                                        <div class="product-info">
+                                            <a href="{{ seoUrl('frontend.detail.page', {'productId': product.id}) }}" class="product-name"
+                                                title="{{product.translated.name}}">       
+                                                {{product.translated.name}}
+                                            </a>
+                                        </div>
+                                        <div class="product-price-info">
+                                            {% set price = real %}
+
+                                            <div class="product-cheapest-price">
+                                                {% if cheapest.unitPrice != real.unitPrice %}
+                                                    <div>{{ "listing.cheapestPriceLabel"|trans|sw_sanitize }}<span class="product-cheapest-price-price"> {{ cheapest.unitPrice|currency }}{{ "general.star"|trans|sw_sanitize }}</span></div>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if displayFrom %}
+                                                {{ "listing.listingTextFrom"|trans|sw_sanitize }}
+                                            {% endif %}
+                                            {{ price.unitPrice|currency }}{{ "general.star"|trans|sw_sanitize }}
+                                        </div>
+                                        <div class="product-action">
+                                            {% if displayFrom %}
+                                                {% block component_product_box_action_detail %}
+                                                    <a href="{{ seoUrl('frontend.detail.page', {'productId': id}) }}"
+                                                    class="btn btn-block btn-light"
+                                                    title="{{ "listing.boxProductDetails"|trans|striptags }}">
+                                                        {{ "listing.boxProductDetails"|trans|sw_sanitize }}
+                                                    </a>
+                                                {% endblock %}
+                                                {% else %}
+                                                <form action="{{ path('frontend.checkout.line-item.add') }}"
+                                                    method="post"
+                                                    class="buy-widget"
+                                                    data-add-to-cart="true">
+
+                                                    {% block component_product_box_action_buy_csrf %}
+                                                        {{ sw_csrf('frontend.checkout.line-item.add') }}
+                                                    {% endblock %}
+
+                                                    {% block component_product_box_action_form %}
+
+                                                        {% block component_product_box_action_buy_redirect_input %}
+                                                            {# fallback redirect back to detail page is deactivated via js #}
+                                                            <input type="hidden"
+                                                                    name="redirectTo"
+                                                                    value="frontend.detail.page">
+
+                                                            <input type="hidden"
+                                                                    name="redirectParameters"
+                                                                    data-redirect-parameters="true"
+                                                                    value='{"productId": "{{ product.id }}"}'>
+                                                        {% endblock %}
+
+                                                        {% block page_product_detail_buy_product_buy_info %}
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ product.id }}][id]"
+                                                                    value="{{ id }}">
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ id }}][referencedId]"
+                                                                    value="{{ id }}">
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ id }}][type]"
+                                                                    value="product">
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ id }}][stackable]"
+                                                                    value="1">
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ id }}][removable]"
+                                                                    value="1">
+                                                            <input type="hidden"
+                                                                    name="lineItems[{{ id }}][quantity]"
+                                                                    value="{{ product.minPurchase }}">
+                                                        {% endblock %}
+
+                                                        {% block page_product_detail_product_buy_meta %}
+                                                            <input type="hidden"
+                                                                    name="product-name"
+                                                                    value="{{ product.translated.name }}">
+                                                        {% endblock %}
+
+                                                        {% block page_product_detail_product_buy_button %}
+                                                            <button class="btn btn-block btn-buy"
+                                                                    title="{{ "listing.boxAddProduct"|trans|striptags }}">
+                                                                {{ "listing.boxAddProduct"|trans|sw_sanitize }}
+                                                            </button>
+                                                        {% endblock %}
+                                                    {% endblock %}
+                                                    
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="font-size:17px;">{{"wk-mp.public-profile.emptyMessage"|trans}}</div>
+                {%  endif %}
+                {% if profileDetails.totalProducts > 10 %}
+                <div class="col-md-auto">
+                    {% set pageCount = (profileDetails.totalProducts /10)|round(0,'ceil') %}
+                    
+                    {% set page = app.request.query.all['p']? app.request.query.all['p']:1 %}
+                    <nav aria-label="pagination" class="pagination-nav">
+                    <ul class="pagination">
+                        {% for i in range(1,pageCount) %}
+                            <form action="">
+                            <li class="page-item {% if (page == i) %} active {% endif %}">
+                                <input type="submit" name="p" id="p{{i}}" value="{{i}}" class="d-none" title="pagination">
+                                <label class="page-link" for="p{{i}}">{{i}}</label>
+                            </li>
+                            </form>
+                        {% endfor %}
+                    </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+
+            <div id="reviews" class="tabcontent">
+                
+                <div id="seller-profile">   
+                    <div @click="toggleReviewForm" v-if="isCustomerVerified" class="mp-add-review">
+                        <button type="button" id="open" class="btn btn-primary" v-if="!reviewForm">{{"wk-mp.public-profile.writeReview"|trans}}</button>    
+
+                        <button type="button" id="close" title="Cancel" v-else class="btn btn-light btn-sm">{{"wk-mp.public-profile.backButton"|trans}}</button}}</button}}</button}}</button>
+                        
+                    </div>
+                    
+                    <div v-if="!currentCustomerId" class="mp-add-review">
+                        <a href="{{ path('frontend.account.login.page') }}">
+                            <button type="button" id="open" class="btn btn-primary">{{"wk-mp.public-profile.loginForReview"|trans}}</button>
+                        </a>
+                    </div>
+
+                    <div v-if="reviewForm">
+                        <add-review></add-review>
+                    </div>
+                    <div class="review-container" v-else>
+                        <div class="seller--review-wrapper" v-for="(review, index) in sellerReviews">
+                            <div class="seller--stars">
+                                <i class="mp-icon mp-review--star" v-for="index in 5" v-text="index > review.reviewRating ? '&#9734;' : '&#9733;'"></i>
+                                <span class="review-date">~review.createdAt~</span>
+                            </div>
+                            <div class="review-text">
+                                <div>
+                                    <label class="review-label">{{"wk-mp.public-profile.author"|trans}}: </label>
+                                    <p style="display:inline-block;">~review.customerName~</p>
+                                </div>
+                                <div>
+                                    <label class="review-label">{{"wk-mp.public-profile.title"|trans}}: </label>
+                                    <p style="display:inline-block;">~review.reviewTitle~</p>
+                                </div>
+                                <div>
+                                    <p>~review.reviewDescription~</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="sellerReviews.length <= 0"><p>{{"wk-mp.public-profile.emptyReviewMessage"|trans}}</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="contact" class="tabcontent">
+                <h2 style="margin-left:16px;">{{"wk-mp.public-profile.contactSellerHeadlineText"|trans}}</h2>
+                <div id="contact-seller">
+                <div class="contact-success-message"></div>
+                <form @submit.prevent="submitContact">
+                    <div class="form-group col-sm-12">
+                        <label class="form-label" for="user-name">{{"wk-mp.public-profile.nameFieldLabel"|trans}}</label>
+                        <input class="form-control" name="user_name" v-model="userName" required/>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label class="form-label" for="user-email">{{"wk-mp.public-profile.emailFieldLabel"|trans}}</label>
+                        <input type="email" class="form-control" name="user_email" v-model="userEmail" required/>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label class="form-label" for="subject">{{"wk-mp.public-profile.subjectFieldLabel"|trans}}</label>
+                        <input class="form-control" name="subject" v-model="subject" required/>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label class="form-label" for="query">{{"wk-mp.public-profile.queryFiledLabel"|trans}}</label>
+                        <textarea class="form-control" name="query" v-model="query" required></textarea>
+                    </div>
+                    <input type="hidden" name="seller_email" v-model="sellerEmail"/>
+                    <button type="submit" class="btn btn-primary">{{"wk-mp.public-profile.submitButtonLabel"|trans}}</button>
+                </form>
+                </div>
+            </div>
+        </div>
+    
+    <script type="text/javascript">
+        function openPage(pageName, elmnt) {
+            // Hide all elements with class="tabcontent" by default */
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Show the specific tab content
+            document.getElementById(pageName).style.display = "block";
+
+            // Add the specific color to the button used to open the tab content
+            //elmnt.style.backgroundColor = color;
+        }
+
+            // Get the element with id="defaultOpen" and click on it
+            document.getElementById("defaultOpen").click();
+    </script>
+     <script type="text/javascript">
+        (() => {    
+            
+            Vue.use(VueRouter)
+            Vue.component('paginate', VuejsPaginate)
+
+            const router = new VueRouter({
+            })
+            new Vue({
+                el: '#contact-seller',
+                data: function () {
+                    return {
+                        userName: "{{context.customer.firstName}} {{context.customer.lastName}}",
+                        userEmail: "{{context.customer.email}}",
+                        sellerEmail: "{{profileDetails.profile.email}}",
+                        subject: '',
+                        query: ''
+                    }
+                },
+                methods: {
+                    submitContact(event) {
+                        let data = new FormData(event.target);
+                        let url = "{{path('frontend.marketplace.contact.seller')}}"
+                        axios.post(url,data).then(response=>{
+                            if(response) {
+                                window.storefrontAlert({alertType: 'success', alertMessage: 'Query sent successfully', parentId: 'contact-success-message'});
+                                this.subject = '';
+                                this.query = '';
+                            }
+                        })
+                    }
+                }
+            })
+            new Vue({
+                router,
+                el: '#seller-profile',
+                data: function () {
+                    return {
+                        limit: 10,
+                        page: this.$route.query.page ? parseInt(this.$route.query.page) : 1,
+                        window: window,
+                        profileDetails: {},
+                        sellerProducts: {},
+                        sellerReviews: {},
+                        reviewForm: false,
+                        isCustomerVerified: false,
+                        tabCollection: {
+                            'description': true,
+                        },
+                        environment: '{{ environment }}',
+                        baseUrl: '{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl,
+                        currentCustomerId: "{{ context.customer.id }}",
+                        loginPath: `${"{{ environment }}" == "dev" ? window.baseUrl: window.location.origin}/account/login?redirectTo=frontend.marketplace.seller.public.profile&redirectParameters=${JSON.stringify({customerId:"{{ app.request.get('customerId') }}"})}`,
+                        attachmentDirectoryPath: `${"{{ environment }}" == "dev" ? window.baseUrl: window.location.origin}/mp-media/public-profile/{{ app.request.get('customerId') }}/`,
+                        'pageCount': 0,
+                        currency: null
+                        
+                    }
+                },
+
+                beforeMount: function () {
+                    this.getSellerData();
+                    
+                },
+                watch: {
+                    '$route.query.page': function (newValue, oldValue) {
+                        this.getSellerData();
+                    }
+                },
+
+                methods: {
+                    
+                    getSellerData: function () {
+                        this.getSellerProfile("{{ app.request.get('customerId') }}")
+                        .then(response => {
+                            if (!response.data.status) {
+                                window.storefrontAlert({alertType: 'danger', alertMessage: 'The requested page cannot be found.', timeout: "stay"});
+                            } else {
+                                this.currency = response.data.currency;
+                                this.pageCount = Math.ceil(response.data.sellerProducts.total / this.limit);
+                                this.profileDetails = response.data.profile;
+                                if(this.profileDetails.logoUrl == null){
+                                this.profileDetails.logoUrl = this.attachmentDirectoryPath+'logo.png';
+                                }
+                                if(this.profileDetails.bannerUrl == null){
+                                    this.profileDetails.bannerUrl = this.attachmentDirectoryPath+'banner.png';
+                                }
+                                if(this.profileDetails.ownerUrl == null){
+                                    this.profileDetails.ownerUrl = this.attachmentDirectoryPath+'owner.png';
+                                }
+                                this.sellerReviews = response.data.sellerReviews;
+                                this.sellerProducts = response.data.sellerProducts.productsCollection;
+                                this.attachmentDirectoryPath = `${'{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl}/mp-media/public-profile/${response.data.profile.id}/`;
+
+                                this.verifyLoggedInCustomer();
+                            }
+                        })
+                    },
+
+                    getSellerProfile: function (customerId) {
+                        return new Promise((resolve, reject) => {
+                            axios.get(`${'{{ environment }}' == 'dev' ? window.location.origin : window.baseUrl}/storefront-api/${customerId}/profile?page=${this.page}&limit=${this.limit}`)
+                            .then(response => {
+                                resolve(response);
+                            })
+                            .catch(error => {
+                                reject();
+                            })
+                        })
+                    },
+
+                    changeTab: function(event) {
+                        if (event.target.id) {
+                            Object.keys(this.tabCollection).map(tab => this.tabCollection[tab] = false);
+                            this.$set(this.tabCollection, event.target.id, true);
+                        }
+                    },
+
+                    toggleReviewForm: function (event) {
+                        let targettedElementId = event.target.id;
+
+                        if (targettedElementId == "open") {
+                            this.reviewForm = true;
+                        } else {
+                            this.reviewForm = false;
+                        }
+                    },
+
+                    verifyLoggedInCustomer: function () {
+                        isValid = false;
+
+                        this.getSellerProfile("{{context.customer.id}}")
+                        .then(response => {
+
+                            if (
+                                "{{ context.customer.id }}" &&
+                                "{{ context.customer.id }}" !== "{{ app.request.get('customerId') }}" &&
+                                "{{ app.request.get('customerId') }}" !== response.data.profile.storeSlug
+                            ) {
+                                isValid = true;
+                            }
+
+                            this.isCustomerVerified = isValid;
+                        })
+
+                        return true;
+                    },
+                    submitContact: function () {
+
+                    },
+                    paginate: function () {
+                        this.$router.push({ query: { page: this.page }})
+                    },
+                },
+
+                delimiters: ['~', '~'],
+            })
+        })()
+    </script>
+
+{% endblock %}
+
+

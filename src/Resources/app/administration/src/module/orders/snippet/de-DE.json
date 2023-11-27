@@ -1,0 +1,33 @@
+{
+    "mp-order": {
+        "general": {
+            "orderIcon": "default-shopping-paper-bag",
+            "mainMenuItemList": "Marktplatz Aufträge",
+            "descriptionTextModule": "Verwalten Sie hier Ihre Marktplatzbestellungen.",
+            "mainMenuItemListHeading": "Bestellungen des Verkäufers verwalten"
+        },
+        "list": {
+            "columnCollection": ["Marktplatz Produkt", "Menge", "Gesamtmenget", "Verkäufer Einnahmen", "Provisionsbetrag", "Hergestellt in", "Status", "Order Number", "Marktplatzbestellstatus"],
+            "messageEmpty": "Noch keine Bestellungen.",
+            "shippingLabel": "Versandaufkleber",
+            "downloadShippingLabelTitle": "Versandetikett herunterladen",
+            "printShippingLabelTitle": "Versandetikett drucken",
+            "paidLabel": "Bezahlt",
+            "notPaidLabel": "Nicht bezahlt",
+            "shippingLabelSuccessMessage": "Versandetikett erfolgreich erstellt",
+            "shippingLabelWarningMessage": "Versandetikett bereits erstellt"
+        },
+        "detail": {
+            "columnProductName": "Artikel",
+            "columnItemStatus": "Status",
+            "cardTitle": "Status der Marktplatzbestellung",
+            "successTitle": "Erfolg",
+            "successMessage": "Bestellstatus erfolgreich aktualisiert!",
+            "cancelLabel": "Abgesagt",
+            "titleSuccess": "Erfolg",
+            "titleWarning": "Warnung",
+            "titleError": "Fehler",
+            "messageSaveSuccess": "Zahlung erfolgreich bezahlt"
+        }
+    }
+}

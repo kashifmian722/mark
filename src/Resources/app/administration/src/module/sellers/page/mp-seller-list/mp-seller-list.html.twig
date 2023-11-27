@@ -1,0 +1,173 @@
+{% block mp_seller_list %}
+    <sw-page class="mp-seller-list">
+
+        {% block mp_seller_list_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block mp_seller_list_smart_bar_header_title %}
+                    <h2>
+                        {% block mp_seller_list_smart_bar_header_title_text %}
+                            {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                            {{ $tc('mp-seller.general.mainMenuItemListHeading') }}
+                        {% endblock %}
+
+                        {% block mp_seller_list_smart_bar_header_amount %}
+                            <span v-if="sellerListLoader" class="sw-page__smart-bar-amount">
+                                ({{ total }})
+                            </span>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+            <template #smart-bar-actions>
+                <sw-button :routerLink="{name: 'mp.seller.create'}">{{$tc('mp-seller.list.addSellerButtonLabel')}}</sw-button>
+            </template>
+        {% endblock %}
+        {# {% block  mp_seller_list_smart_bar_action %}
+            <template #smart-bar-actions>
+                <sw-button :routerLink="{name: 'mp.seller.create'}">Add Seller</sw-button>
+            </template>
+        {% endblock %} #}
+
+        <template slot="content">
+            {% block mp_seller_list_content %}
+                <sw-entity-listing
+                    v-if="marketplaceSellerCollection"
+                    :isLoading="sellerListLoader"
+                    :items="marketplaceSellerCollection"
+                    :repository="sellerRepository"
+                    :showSelection="true"
+                    :columns="columns"
+                    @select-item="onSelectionChanged"
+                    @select-all-items="onSelectionChanged"
+                    @column-sort="onSortColumn"
+                    @inline-edit-save="onInlineEditSave"
+                    @inline-edit-cancel="onInlineEditCancel"
+                    detailRoute="mp.seller.detail">
+
+                    {# customer name #}
+                    <template slot="column-customerName" slot-scope="{ item }">
+                        <router-link :to="{ name: 'sw.customer.detail.base', params: { id: item.customer.id }  }">
+                            {{ item.customer.firstName }} {{ item.customer.lastName }}
+                        </router-link>
+                    </template>
+
+                    {# customer email #}
+                    <template slot="column-customerEmail" slot-scope="{ item }">
+                        {{ item.customer.email }}
+                    </template>
+
+                    {# is customer applied #}
+                    <template slot="column-isApplied" slot-scope="{ item, isInlineEdit }">
+                        <template v-if="isInlineEdit">
+                            <sw-checkbox-field v-model="item.isApplied"></sw-checkbox-field>
+                        </template>
+
+                        <template v-else>
+                            <sw-icon v-if="item.isApplied" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
+                            <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                        </template>
+                    </template>
+
+                    {# is customer approved #}
+                    <template slot="column-isApproved" slot-scope="{ item, isInlineEdit }">
+                        <template v-if="isInlineEdit">
+                            <sw-checkbox-field v-model="item.isApproved"></sw-checkbox-field>
+                        </template>
+
+                        <template v-else>
+                            <sw-icon v-if="item.isApproved" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
+                            <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                        </template>
+                    </template>
+
+                    {# seller total orders #}
+                    <template slot="column-totalOrders" slot-scope="{ item }">
+                        <template v-if="item.ordersCount">
+                            <router-link :to="{ name: 'mp.order.list', query: { customerId: item.customer.id }  }">
+                                {{ item.ordersCount }}
+                            </router-link>
+                        </template>
+
+                        <template v-else>
+                            {{ item.ordersCount }}
+                        </template>
+                    </template>
+                    {# admin commission #}
+                    <template slot="column-adminCommission" slot-scope="{item, isInlineEdit}">
+                        <template v-if="isInlineEdit">
+                            <sw-number-field v-model="item.adminCommission"></sw-number-field>
+                        </template>
+                        <template v-else>
+                            <div v-if="item.adminCommission">
+                                {{item.adminCommission}}
+                            </div>
+                            <div v-else>
+                                --
+                            </div>
+                        </template>
+                    </template>
+                    {# total Income #}
+                    {# <template slot="column-totalIncome" slot-scope="{item}">
+                        <div v-if="item.totalIncome">
+                            {{item.totalIncome.toFixed(2)}} 
+                        </div>
+                        <div v-else>
+                            --
+                        </div>
+                    </template> #}
+                    {# seller Income#}
+                    {# <template slot="column-totalPayout" slot-scope="{item}">
+                    <div v-if="item.totalPayout">
+                        {{item.totalPayout.toFixed(2)}} 
+                    </div>
+                    <div v-else>
+                        --
+                    </div>
+                    </template> #}
+
+                    {# seller created date #}
+                    <template slot="column-createdAt" slot-scope="{ item }">
+                        {{ item.createdAt | date() }}
+                    </template>
+
+                    {# seller type #}
+                    <template slot="column-type" slot-scope="{ item }">
+                        {{ typeOptions[item.type].name }}
+                    </template>
+
+                    {# Disable delete button #}
+                    <template slot="actions" slot-scope="{ item }">
+                        {% block mp_seller_list_grid_columns_actions_delete %}
+                            <sw-context-menu-item variant="danger" disabled>
+                                {# {{ $tc('sw-order.list.contextMenuDelete') }} #}
+                            </sw-context-menu-item>
+                        {% endblock %}
+                        {% block mp_seller_list_grid_columns_actions_edit %}
+                        <sw-context-menu-item
+                        :routerLink="{ name: 'mp.seller.detail', params: { id: item.id }  }"
+                        >
+                        {{ $tc('mp-transaction.list.contextMenuEdit') }}
+                        </sw-context-menu-item>
+                        {% endblock %}
+                    </template>
+                    <template slot="bulk">
+                        {% block sw_data_grid_bulk_selected_actions_content %}
+                            <span class="sw-data-grid__bulk-selected bulk-link">
+                            <a class="link link-default" @click="approveSeller">
+                                {{ $tc('mp-product.list.approveText') }}
+                            </a></span>
+                            <span class="sw-data-grid__bulk-selected bulk-link">
+                            <a class="link link-default" @click="disapproveSeller">
+                                {{ $tc('mp-product.list.disapproveText') }}
+                            </a></span>
+                        {% endblock %}
+                    </template>
+                </sw-entity-listing>
+
+                <sw-empty-state v-if="sellerListLoader && !total" :icon="$tc('mp-seller.general.icon')" :title="$tc('mp-seller.list.messageEmpty')" color="rgb(248, 137, 98)"></sw-empty-state>
+            {% endblock %}
+
+        </template>
+    </sw-page>
+{% endblock %}

@@ -1,0 +1,128 @@
+<sw-page class="mp-order-list">
+
+    {% block mp_order_list_smart_bar_header %}
+        <template #smart-bar-header>
+            {% block mp_order_list_smart_bar_header_title %}
+                <h2>
+                    {% block mp_order_list_smart_bar_header_title_text %}
+                        {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                        {{ $tc('mp-order.general.mainMenuItemListHeading') }}
+                    {% endblock %}
+
+                    {% block mp_order_list_smart_bar_header_amount %}
+                        <span v-if="orderListLoader" class="sw-page__smart-bar-amount">
+                            ({{ total }})
+                        </span>
+                    {% endblock %}
+                </h2>
+            {% endblock %}
+        </template>
+    {% endblock %}
+
+    <template slot="content">
+        {% block mp_order_list_content %}
+            {# transaction modal#}
+            <sw-modal
+                v-if="showModal"
+                @modal-close="showModal =isModalLoading = false"
+                :title="$tc('mp-order.transaction.ModalTitle')"
+                variant="small">
+                <sw-textarea-field v-model="transactionMessage"></sw-textarea-field>
+
+                <template #modal-footer>
+                    <sw-button 
+                        @click="cancelModal"
+                        size="small"
+                        :disabled="isModalLoading">
+                        cancel
+                    </sw-button>
+
+                    <sw-button @click="paySeller(transactionMessage)" variant="primary" size="small" :isLoading="isModalLoading">
+                        Submit
+                    </sw-button>
+                </template>
+            </sw-modal>
+            <sw-entity-listing
+                v-if="marketplaceOrderCollection"
+                :isLoading="orderListLoader"
+                :items="marketplaceOrderCollection"
+                :repository="commissionRepository"
+                :showSelection="false"
+                :columns="columns">
+
+                  {# order id#}
+                <template slot="column-orderNumber" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.order.detail', params: { id: item.marketplace_order.order.id }  }">
+                        {{ item.marketplace_order.order.orderNumber}}
+                    </router-link>
+                </template>
+
+                {# product name #}
+                <template slot="column-productName" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.product.detail.base', params: { id: item.marketplace_order.marketplace_product.productId }  }">
+                        {{ item.marketplace_order.marketplace_product.product.name }}
+                    </router-link>
+                </template>
+
+                {# order_line_item quantity #}
+                <template slot="column-quantity" slot-scope="{ item }">
+                    {{ item.marketplace_order.order_line_item.quantity }}
+                </template>
+
+                {# order's total amount #}
+                <template slot="column-totalAmount" slot-scope="{ item }">
+                    {{ item.marketplace_order.order_line_item.price.totalPrice | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# seller's earnings #}
+                <template slot="column-sellerEarnings" slot-scope="{ item }">
+                    {{ item.sellerEarning | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# owner's commission #}
+                <template slot="column-commissionAmount" slot-scope="{ item }">
+                    {{ item.commissionAmount | currency(item.marketplace_order.currency.isoCode) }}
+                </template>
+
+                {# created at date #}
+                <template slot="column-createdAt" slot-scope="{ item }">
+                    {{ item.createdAt | date() }}
+                </template>
+                {# transaction status#}
+                <template slot="column-isPaid" slot-scope="{item}">
+                    <div v-if="item.isPaid == true"> {{ $tc('mp-order.list.paidLabel') }}</div>
+                    <div v-else>
+                        {{ $tc('mp-order.list.notPaidLabel') }}
+                    </div>
+                    
+
+                </template>
+                {# shipping label#}
+                <template slot="column-shippingLabel" slot-scope="{item}" v-if="dhlAddon">
+                    <sw-loader size="50px" v-if="isLoading"></sw-loader>
+                    <a v-if="item.shippingLabel" :href="baseUrl+item.marketplace_order.order.orderNumber+ '/'+item.marketplace_order.order_line_item.productId+ '.pdf' " class="btn btn-primary" :title="$tc('mp-order.list.downloadShippingLabelTitle')" download><sw-button><sw-icon name="default-action-circle-download" color="#1abc9c"></sw-icon></sw-button></a>
+                    <a v-if="item.shippingLabel" :href="baseUrl+item.marketplace_order.order.orderNumber+ '/'+item.marketplace_order.order_line_item.productId+ '.pdf' " class="btn btn-primary" :title="$tc('mp-order.list.printShippingLabelTitle')" @click="printWindow()" target="_blank"><sw-button><sw-icon name="default-device-printer" color="#1abc9c"></sw-icon></sw-button></a>
+                </template>
+
+                {# Disable delete button #}
+                <template slot="actions" slot-scope="{ item }">
+                    
+                    {% block mp_order_list_grid_columns_actions_delete %}
+                        <sw-context-menu-item variant="danger" disabled>
+                            {{ $tc('sw-order.list.contextMenuDelete') }}
+                        </sw-context-menu-item>
+                    {% endblock %}
+                    {% block mp_order_list_grid_columns_actions_shipping_label %}
+                        <sw-context-menu-item v-if="dhlAddon"  @click="createShippingLabel(item.marketplace_order.order.orderNumber, item.marketplace_order.order_line_item.productId, item.marketplace_order.order_line_item.quantity, item.marketplaceSellerId, item.marketplace_order.order_line_item.price.totalPrice)">
+                            {{ $tc('mp-order.list.shippingLabel') }}
+                        </sw-context-menu-item>
+                    {% endblock %}
+                </template>
+            </sw-entity-listing>
+
+            <sw-empty-state v-if="orderListLoader && !total" :icon="$tc('mp-order.general.orderIcon')" color="rgb(160, 146, 240)" :title="$tc('mp-order.list.messageEmpty')"></sw-empty-state>
+        {% endblock %}
+    </template>
+
+</sw-page>

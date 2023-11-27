@@ -1,0 +1,43 @@
+{% block wk_mp_seller_create %}
+    <sw-page>
+        {% block wk_mp_seller_create_smart_bar_actions %}
+            <template slot="smart-bar-actions">
+                <sw-button :routerLink="{name: 'mp.seller.list'}">
+                    {{$t('mp-seller.detail.cancelButtonText')}}
+                </sw-button>
+                <sw-button-process
+                    :isLoading="isLoading"
+                    :processSuccess="processSuccess"
+                    variant="primary"
+                    @process-finish="saveFinish"
+                    @click="onClickSave">
+                    {{ $t('mp-seller.detail.saveButtonText') }}
+                </sw-button-process>
+            </template>
+        {% endblock %}
+        {% block wk_mp_seller_create_content %}
+            <template slot="content">
+                <sw-card-view>
+                    <sw-card>
+                        <sw-entity-multi-select
+                            :label="$t('mp-seller.create.selectCustomerLabel')"
+                            :entityCollection="customerCollection" :criteria="customerCriteria"
+                            entity="customer" @change="setCustomer">
+                            <template #result-item="{ item, index }">
+                                <li is="sw-select-result" v-bind="{ item, index }">
+                                <span class="sw-select-result__result-item-text">
+                                    {{item.firstName}} {{item.lastName}}
+                                </span>
+                                </li>
+                            </template>
+                            <template #selection-label-property="{ item }">
+                                {{item.firstName}} {{item.lastName}}
+                            </template>
+                        </sw-entity-multi-select>
+                    </sw-card>
+                </sw-card-view>
+            </template>
+        {% endblock %}
+
+    </sw-page>
+{% endblock %}

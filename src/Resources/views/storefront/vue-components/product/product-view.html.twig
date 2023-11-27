@@ -1,0 +1,1078 @@
+{% include '@WebkulMVMarketplace/storefront/vue-components/product/table-view.html.twig' %}
+ 
+<template id="product-view-template">
+    <div class="marketplace-products">
+        <div class="account-welcome">
+            <div class="account-welcome" v-if="product.productId">
+                <h1>{{"wk-mp.product.view.headerTitle"|trans}}</h1>
+                <p>{{"wk-mp.product.view.headerDescription"|trans}}</p>
+            </div>
+
+            <div class="account-welcome" v-else>
+                <h1>{{"wk-mp.product.create.headerTitle"|trans}}</h1>
+                <p>{{"wk-mp.product.create.headerDescription"|trans}}</p>
+            </div>
+        </div>
+        <div class="form-action-buttons" style="text-align:right">
+            <button type="button" title="{{"wk-mp.product.button.cancel"|trans}}" class="btn btn-light btn-sm cancel-btn" @click="$root.renderProductList">{{"wk-mp.product.button.cancel"|trans}}</button>
+            
+            <button type="submit" ref="saveButton" class="product-form-submit btn btn-primary" title="{{"wk-mp.product.button.saveProduct"|trans}}" v-text="product.productId ? '{{"wk-mp.product.button.updateProduct"|trans}}' : '{{"wk-mp.product.button.saveProduct"|trans}}'"  form="productForm"></button>
+
+        </div>
+        <div class="card">
+            <div class="product-tabs" @click="changeTab" v-if="product.productId">
+                <span :class="currentTab['general'] ? 'active' : false" id="general">{{"wk-mp.product.create.generalTab"|trans}}</span>
+                <span :class="currentTab['variant'] ? 'active' : false" id="variant">{{"wk-mp.product.create.variantTab"|trans}}</span>
+                <span :class="currentTab['advancedPrice'] ? 'active' : false" id="advancedPrice">{{"wk-mp.product.create.advancedPriceTab"|trans}}</span>
+            </div>
+            <form @submit.prevent="updateProduct" id="productForm">
+                <div class="card-body" v-if="currentTab['general']">
+                    {# <div class="form-action-buttons" style="text-align:right">
+                        <a :href=`${window.baseUrl}/detail/${product.productId}` target="_blank" title="{{"wk-mp.product.button.viewProduct"|trans}}" v-if="product.productId && product.active">
+                            <button type="button" class="btn btn-primary">{{"wk-mp.product.button.viewProduct"|trans}}</button>
+                        </a>
+                    </div> #}
+                    <div class="form-row">
+                        <div class="form-group col-sm-12">
+                            <label class="form-label" for="product-name">{{"wk-mp.product.input-label.productName"|trans}}*</label>
+                            <input type="text" class="form-control half-width"
+                                id="productName" placeholder="{{"wk-mp.product.input-label.productName"|trans}}" name="name" v-model="product['name']" @change="verifySpace" required
+                                @keyup="updateTitle"/>
+                                <span class="error">~productNameError~</span>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label class="form-label" for="product-net-price">{{"wk-mp.product.input-label.price"|trans}}<span v-if="currency">(~currency.symbol~)</span>*</label>
+                            <input type="number" class="form-control" step="0.01"
+                                id="productPrice" placeholder="0" name="price" v-model="product['price']" required
+                                />
+                            
+                        </div>
+                        
+
+                        <div class="form-group col-sm-3">
+                            <label class="form-label" for="product-number">{{"wk-mp.product.list.productNumber"|trans}}*</label>
+                            <input type="text" class="form-control" id="productNumber" placeholder="{{"wk-mp.product.list.productNumber"|trans}}" name="number" v-model="product['productNumber']" required/>
+                        </div>
+
+                        <div class="form-group col-sm-3">
+                            <label class="form-label" for="product-stock">{{"wk-mp.product.input-label.stock"|trans}}*</label>
+                            <input type="number" class="form-control" step="1" pattern="^[0-9]" min="0" id="productStock" placeholder="{{"wk-mp.product.input-label.stock"|trans}}" name="stock" v-model="product['stock']" required/>
+                        </div>
+                        
+                        <div class="form-group col-sm-12" style="margin-bottom:100px;">
+                            <label class="form-label" for="product-description">{{"wk-mp.product.input-label.description"|trans}}</label>
+                            <div id="quill-editor">
+                                <p v-html="product['description']"></p>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-sm-6">
+                            <label class="form-label" for="product-tax">{{"wk-mp.product.input-label.tax"|trans}}*</label>
+                            <select class="custom-select" name="tax" v-model="product['tax']" :required="'required'">
+                                <option v-for="(tax, index) in taxes" :key="tax.id" :value="tax.id">~tax.name~</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-6">
+                            <label class="form-label" for="product-manufacturer">{{"wk-mp.product.input-label.manufacturer"|trans}}*</label>
+                            <select class="custom-select" name="manufacturer" v-model="product['manufacturer']" :required="'required'">
+                                <option v-for="(manufacturer, index) in manufacturers" :key="manufacturer.id" :value="manufacturer.id">~manufacturer.name~</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label class="form-label" for="min-order-quantity">{{"wk-mp.product.input-label.minOrderQuantity"|trans}}</label>
+                            <input type="number"  class="form-control" name="minPurchase" min="1" v-model="product['minPurchase']" placeholder="{{"wk-mp.product.input-label.minOrderQuantityPlaceholder"|trans}}">
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <label class="form-label" for="max-order-quantity">{{"wk-mp.product.input-label.maxOrderQuantity"|trans}}</label>
+                            <input type="number"  class="form-control" name="maxPurchase" v-model="product['maxPurchase']" placeholder="{{"wk-mp.product.input-label.maxOrderQuantityPlaceholder"|trans}}">
+                        </div>
+                        
+
+                        <div class="form-group col-sm-12">
+                            <label class="form-label" for="product-category">{{"wk-mp.product.input-label.category"|trans}}</label>
+                            <div class="selected-categories toggle-category-tree" @click="toggleCategoryTree">
+                                <div class="category-wrapper" v-for="category in product.categories" :key="category.id">
+                                    <span>~category.name~</span>
+                                    <button title="Dismiss" class="sw-label__dismiss" @click="removeCategory(category.id)">
+                                        <span class="sw-icon-cross">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                                <path fill="#758CA3" fill-rule="evenodd" d="M8,6.58578644 L11.2928932,3.29289322 C11.6834175,2.90236893 12.3165825,2.90236893 12.7071068,3.29289322 C13.0976311,3.68341751 13.0976311,4.31658249 12.7071068,4.70710678 L9.41421356,8 L12.7071068,11.2928932 C13.0976311,11.6834175 13.0976311,12.3165825 12.7071068,12.7071068 C12.3165825,13.0976311 11.6834175,13.0976311 11.2928932,12.7071068 L8,9.41421356 L4.70710678,12.7071068 C4.31658249,13.0976311 3.68341751,13.0976311 3.29289322,12.7071068 C2.90236893,12.3165825 2.90236893,11.6834175 3.29289322,11.2928932 L6.58578644,8 L3.29289322,4.70710678 C2.90236893,4.31658249 2.90236893,3.68341751 3.29289322,3.29289322 C3.68341751,2.90236893 4.31658249,2.90236893 4.70710678,3.29289322 L8,6.58578644 Z"></path>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div v-if="product.categories.length <= 0" class="toggle-category-tree">
+                                    <span class="toggle-category-tree">{{"wk-mp.product.input-label.nocategory"|trans}}</span>
+                                </div>
+                            </div>
+
+                            <div class="mp-drop-down-list-container" :class="isViewCategoryTree ? '' : 'nodisplay'">
+                                <category-inner :category-data="categories" environment="{{ environment }}"></category-inner>
+                            </div>
+                            <span class="form-error-text">~formError.category~</span>
+                        </div>
+
+                        <div class="form-group col-sm-12 product--media" v-if="product.media">
+                            <div>
+                                <label class="form-label" for="product-name">{{"wk-mp.product.input-label.media"|trans}} </label>
+                                <span v-if="product.media.length == 0" class="form-control plain-text">{{"wk-mp.product.input-label.mediaMessage"|trans}}</span>
+                            </div>
+                            <div v-for="media in product.media" :key="media.id" class="product-image">
+                                <img :src="media.media.url" />
+                                <span style="cursor:pointer" class="sw-icon icon--small-default-x-line-medium sw-icon--fill sw-icon--small" @click="removeProductImage(media.mediaId,media.media.name)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="#758CA3" fill-rule="evenodd" d="M8,6.58578644 L11.2928932,3.29289322 C11.6834175,2.90236893 12.3165825,2.90236893 12.7071068,3.29289322 C13.0976311,3.68341751 13.0976311,4.31658249 12.7071068,4.70710678 L9.41421356,8 L12.7071068,11.2928932 C13.0976311,11.6834175 13.0976311,12.3165825 12.7071068,12.7071068 C12.3165825,13.0976311 11.6834175,13.0976311 11.2928932,12.7071068 L8,9.41421356 L4.70710678,12.7071068 C4.31658249,13.0976311 3.68341751,13.0976311 3.29289322,12.7071068 C2.90236893,12.3165825 2.90236893,11.6834175 3.29289322,11.2928932 L6.58578644,8 L3.29289322,4.70710678 C2.90236893,4.31658249 2.90236893,3.68341751 3.29289322,3.29289322 C3.68341751,2.90236893 4.31658249,2.90236893 4.70710678,3.29289322 L8,6.58578644 Z"></path></svg></span>
+                            </div>
+
+                            <div>
+                                <label class="form-label" for="product-images">{{"wk-mp.product.input-label.image"|trans}}</label>
+                                <input type="file" name="images" id="product-images" @change="handleProductAddMedia" multiple accept="image/png, image/jpeg, image/jpg" />
+                            </div>
+
+                            <div class="form-error">
+                                <span class="error">~formError.images~</span>
+                            </div>
+                        </div>
+                        <div class="product-type" v-if="groupedproductaddon">
+                            
+                            <label class="grouped-product-label">{{"wk-mp.product.view.productGroupLabel"|trans}} <input type="checkbox" class="grouped-product-checkbox" id="groupOption" name="groupedProductOption" @click="onCheckGroupProduct" :checked="groupProductOption"></label>
+                        </div>
+                        <div class="wk-grouped-products form-group col-sm-12" v-if="groupProductOption &&  groupedproductaddon">
+                            <label class="form-label" for="grouped-product">{{"wk-mp.product.view.addProductGroupLabel"|trans}}</label>
+                            <div class="grouped-product-container">
+                                {# <div class="no-products-message" v-if="groupedProducts.length <= 0">There are no grouped products.</div> #}
+
+                                <div class="grouped-product-table">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>{{"wk-mp.product.input-label.productName"|trans}}</th>
+                                                <th>{{"wk-mp.product.list.productNumber"|trans}}</th>
+                                                <th>{{"wk-mp.product.input-label.price"|trans}}</th>
+                                                <th>{{"wk-mp.product.view.defaultQtyColumn"|trans}}</th>
+                                                <th>{{"wk-mp.product.view.removeColumn"|trans}}</th>
+                                            </tr>
+                                            <tr v-for="product in groupedProducts">
+                                                <td>~product.name~
+                                                    <ul v-for="property in product.propertyData" v-if="product.propertyData">
+                                                        <li v-for="(value, key) in property" :key="key">
+                                                            <strong>
+                                                                ~key~ :-   
+                                                            </strong>
+                                                                ~value~
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>~product.productNumber~</td>
+                                                <td>~currency.symbol~~parseFloat(product.price).toFixed(2)~</td>
+                                                <td><input type="number" min="1" class="form-control" :name=`defaultQty[${product.id}]` :value="product.defaultQty?product.defaultQty:1" @blur="handleNegativeQty"></td>
+                                                <td><a style="cursor:pointer"  @click="removeGroupedProduct(product.id)">{% sw_icon 'trash' %}</a></td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                
+                                <button type="button" title="{{"wk-mp.product.view.addProductsToGroupButton"|trans}}" class="btn btn-primary" style="margin:10px"  data-toggle="modal" data-target="#myModal">{{"wk-mp.product.view.addProductsToGroupButton"|trans}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="myModal" class="modal fade" v-if="groupedproductaddon" >
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">{{"wk-mp.product.view.addProductsToGroupButton"|trans}}</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;<span class="sr-only">Close</span></button>
+                                    
+                                </div>
+                                <div class="modal-body">
+                                <div class="form-action-buttons">
+                                    <button type="button"    title="{{"wk-mp.product.view.addSelectedProductButton"|trans}}" class="btn btn-primary" data-dismiss="modal" @click="addSelectedProduct">{{"wk-mp.product.view.addSelectedProductButton"|trans}}</button>
+                                </div>
+                            
+                                
+                                
+                                <div class="proudct-table">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            
+                                            <div v-if="checkedProduct.length">
+                                                <span>Selected: ~checkedProduct.length~</span>
+                                            </div>
+                                            <tr>
+                                                <th  class="col" style="width:20px"></th>
+                                                <th class="col">{{"wk-mp.product.list.name"|trans}}</th>
+                                                <th class="col">{{"wk-mp.product.list.price"|trans}}</th>
+                                                <th class="col">{{"wk-mp.product.list.availabelStock"|trans}}</th>
+                                                
+                                            </tr>
+                                            
+                                        </thead>
+
+                                        <tbody  data-product-detail-loader="true">
+                                            <tr v-for="(product, index) in allProducts" :key="index">
+                                                <td>
+                                                    <input type="checkbox" id="selectedProduct" v-bind:id="product.id" v-bind:value="product.id" v-model="checkedProduct" @click="singleSelect()" />
+                                                </td>       
+                                                <td>
+                                                    <span class="product-item-value product-item-name-value">~product.name~</span>
+                                                    <ul v-for="property in product.propertyData" v-if="product.propertyData">
+                                                        <li v-for="(value, key) in property" :key="key">
+                                                            <strong>
+                                                                ~key~ :-   
+                                                            </strong>
+                                                                ~value~
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>~currency.symbol~~parseFloat(product.price).toFixed(2)~</td>
+                                                <td>
+                                                    <span class="product-item-value product-item-stock-value">~product.stock~</span>
+                                                </td>
+
+                                                
+                                            </tr>
+
+                                            <div v-if="allProducts && allProducts.length <= 0" class="table-content">
+                                                {{"wk-mp.product.list.notFound"|trans}}
+                                            </div>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <paginate
+                                v-if="pageCount && pageCount - 1"
+                                v-model="pageGroup"
+                                :page-count="pageCount"
+                                :click-handler="paginate"
+                                :prev-text="'Prev'"
+                                :next-text="'Next'"
+                                :container-class="'pagination'">
+                            </paginate>
+                            
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <template v-if="product.productId && currentTab['variant']">
+                    <div class="form-group col-sm-6">
+                        <label class="form-label" for="product-variant">{{"wk-mp.product.input-label.groups"|trans}}*</label>
+                        <select class="custom-select" name="group" :required="'required'" @change="getProductGroupOptions" required>
+                            <option disabed="disabed">Select</option>
+                            <option v-for="(group, index) in propertyGroups" :key="group.id" :value="group.id">~group.name~
+                                <template v-if="group.selectedGroupOptions">
+                                    <span>(~group.selectedGroupOptions.length~ selected)</span>
+                                </template>
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-sm-6" v-if="Object.keys(selectedGroupOptions).length > 0">
+                        <label class="form-label" for="product-variant">{{"wk-mp.product.input-label.groupsOption"|trans}}</label>
+
+                        <ul class="upper-view">
+                            <li v-for="option in selectedGroupOptions" :key="option.id">
+                                <template v-if="isOptionSelected(option.id)">
+                                    <input type="checkbox" class="category-method-input" :value="option.id" @click="addGroupOption" checked>
+                                </template>
+                                <template v-else>
+                                    <input type="checkbox" class="category-method-input" :value="option.id" @click="addGroupOption">
+                                </template>
+                                <span>~option.name~</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group col-sm-12">
+                        <button type="button" class="btn btn-primary" title="{{"wk-mp.product.button.updateVariants"|trans}}" @click="updateVariantCombinations">{{"wk-mp.product.button.updateVariants"|trans}}</button>
+                    </div>
+
+                    <div class="variants-collection" v-if="product.variants.length > 0">
+                        <h3>Variants</h3>
+
+                        <table-view :table-headings="variantHeadings" :table-values="product.variants" :update-url=`${window.baseUrl}/storefront-api/variant/${product.productId}`></table-view>
+                    </div>
+                </template>
+                <template v-if="product.productId && currentTab['advancedPrice']">
+                    <div class=""  v-if="pricingRules.length > 0">
+                        
+                        <div class="sw-card__content" v-for="(pricingRule,index) in pricingRules">
+                            <div class="rule-label">~pricingRule.rule~</div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <select class="form-control" v-if="rules" @change="changePriceRule">
+                                        <option disabled="disabled" selected="selected" value="">
+                                            Select condition rule
+                                        </option>
+                                        <option v-for="rule in rules" v-bind:value="JSON.stringify({id:rule.id,name:rule.name,ruleIndex:index})" :key="rule.id" :selected="pricingRule.ruleId == rule.id" >~rule.name~</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-default" @click="deleteRule(pricingRule.ruleId)">{{"wk-mp.product.view.deleteRuleButton"|trans}}</button>
+                                </div>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td>{{"wk-mp.product.view.advancedPriceColumn1"|trans}}</td>
+                                        <td>{{"wk-mp.product.view.advancedPriceColumn2"|trans}}</td>
+                                        <td>~currency.shortName~</td>
+                                        <td>{{"wk-mp.product.view.advancedPriceColumn4"|trans}}</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(element,key) in pricingRule.prices">
+                                        <td><input type="number" class="form-control" v-model="element.quantityStart" min="0"></td>
+                                        <td>
+                                        <input v-if="pricingRule.prices.length == key+1" type="number" class="form-control" v-model="element.quantityEnd" min="0" placeholder="∞" @blur="addRow(pricingRule)">
+                                        <input v-else type="number" class="form-control" v-model="element.quantityEnd" min="0" placeholder="∞">
+                                        </td>
+                                        <td v-for="price in element.price">
+                                            <input type="number" class="form-control half-width display-inline-block" step="0.01" v-model="price.gross" @keyup="calculateNetPrice($event,pricingRule,key)" placeholder="Enter gross price">
+                                            <input type="number" class="form-control half-width display-inline-block" step="0.01" v-model="price.net"   @keyup="calculateGrossPrice($event,pricingRule,key)" placeholder="Enter net price">
+                                        </td>
+                                        <td><button class="btn btn-primary" @click="removeRow(pricingRule.ruleId,key)">{{"wk-mp.product.view.removeButton"|trans}}</button></td>
+                                    </tr>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                        
+                    </div>
+                    <div class="sw-card__content" v-else>
+                        <label class="form-label">{{"wk-mp.product.view.emptyAdvancedPriceRuleMessage"|trans}}</label>
+                        <select class="form-control" v-if="rules" @change="addPriceRule">
+                            <option disabled="disabled" selected="selected" value="">
+                                {{"wk-mp.product.view.selectRulePlaceholder"|trans}}
+                            </option>
+                            <option v-for="rule in rules" v-bind:value="JSON.stringify({id:rule.id,name:rule.name})" :key="rule.id">~rule.name~</option>
+                        </select>
+                    </div>
+                    <div class="sw-card__content" v-if="isNewRule">
+                        <label class="form-label">{{"wk-mp.product.view.selectRuleRequiredMessage"|trans}}</label>
+                        <select class="form-control" v-if="rules" @change="addPriceRule">
+                            <option disabled="disabled" selected="selected" value="">
+                                {{"wk-mp.product.view.selectRulePlaceholder"|trans}}
+                            </option>
+                            <option v-for="rule in rules" v-bind:value="JSON.stringify({id:rule.id,name:rule.name})" :key="rule.id" >~rule.name~</option>
+                        </select>
+                    </div>
+                    <div style="text-align:center;margin-top:10px">
+                    <button class="btn btn-primary" v-if="pricingRules.length >0" id="addRuleButton" @click="addNewPriceRule">{{"wk-mp.product.view.addPriceRuleButton"|trans}}</button>
+                    </div>
+                </template>
+            </form>
+        </div>
+    </div>
+</template>
+
+<script type="text/javascript">
+    Vue.use(VueRouter)
+    Vue.component('paginate', VuejsPaginate)
+
+    const router = new VueRouter({
+    })
+    Vue.component('product-view', {
+        router,
+        props: ['product','products','relist', 'groupedproductaddon','currency'],
+        template: '#product-view-template',
+        
+        data: function () {
+            if (Object.keys(this.product).length <= 0) {
+                this.$set(this.product, 'tax', []);
+                this.$set(this.product, 'media', []);
+                this.$set(this.product, 'categories', []);
+                this.$set(this.product, 'manufacturer', []);
+                this.$set(this.product, 'variants', 'Select Product Group');
+                this.$set(this.product, 'productNumber', `MP${Math.floor(Math.random() * 90000) + 10000}`);
+                this.$set(this.product, 'minPurchase', 1);
+            } else {
+                this.formatProductVariants();
+            }
+
+            return {
+                'environment': '{{ environment }}',
+                'taxes':[],
+                'categories':[],
+                'window':window,
+                'formError': {},
+                'manufacturers':[],
+                'propertyGroups': [],
+                'currentTab': {
+                    'general': true
+                },
+                'selectedGroupId': '',
+                'variantHeadings': [
+                    'Name', 'Price', 'Stock', 'Status', 'Action'
+                ],
+                'productImages': [],
+                'variantCombination': [],
+                'removeCategoryList': [],
+                'selectedGroupOptions': [],
+                'isViewCategoryTree': false,
+                'selectedCategory': 'Select Category',
+                'removeMediaList': [],
+                'productNameError': '',
+                'allSelected': false,
+                'checkedProduct': [],
+                'groupedProductArray': [],
+                'groupedProducts': this.product.groupedProduct?this.product.groupedProduct:[],
+                'groupPrice': null,
+                'groupProductOption': this.product.groupedProduct ? true: false,
+                'productName': null,
+                'productStatus':  null,
+                'allProducts': null,
+                'pageCount': 0,
+                'pageGroup': this.$route.query.pageGroup ? parseInt(this.$route.query.pageGroup) : 1,
+                'limit': 10,
+                'rules': [],
+                'pricingRules': this.product.advancedPrices?this.product.advancedPrices:[],
+                'isNewRule': false,
+                'selectedRuleId': null
+         
+                
+            }
+        },
+
+        beforeMount: function () {
+            this.getProductMetaData();
+        },
+            
+        mounted: function () {
+            this.quill = new Quill('#quill-editor', {
+                theme: 'snow'
+            });
+            this.getAllProducts();
+        },
+        watch: {
+            
+            '$route.query.pageGroup': function (newValue, oldValue) {
+                this.getAllProducts();
+            }
+        },
+
+        methods: {
+            handleNegativeQty(e){
+                if(e.target.value < 1) {
+                    e.target.value = 1;
+                }
+            },
+            
+            onCheckGroupProduct: function(){
+                var checkBox = document.getElementById("groupOption");
+                if(checkBox.checked == true){
+
+                    this.groupProductOption = true;
+                } else{
+                    this.groupProductOption = false;
+                }
+            },
+            paginate: function () {
+                    this.$router.push({ query: { pageGroup: this.pageGroup }})
+                },
+            removeGroupedProduct: function(productId) {
+                for (key in this.groupedProducts) {
+                    if(this.groupedProducts[key].id == productId) {
+                        if(confirm("Are you sure want to delete it?")){
+                            this.groupedProducts.splice(key, 1);
+                        }
+                    }
+                }
+                for (key in this.checkedProduct) {
+                    if(this.checkedProduct[key] == productId) {
+                        this.checkedProduct.splice(key, 1);
+                    }
+                }
+                
+                
+            },
+            addSelectedProduct: function() {
+                this.groupedProducts = [];
+                for (product in this.allProducts) {
+                    if(this.checkedProduct.indexOf(this.allProducts[product].id) != -1){
+                        this.groupedProducts.push(this.allProducts[product])
+                    }
+                }
+                this.pageGroup = 1;
+                this.paginate();
+            },
+            getAllProducts: function () {
+                    let url = `${window.baseUrl}/marketplace/grouped/products?pageGroup=${this.pageGroup}&limit=${this.limit}`;
+                    
+                    axios.get(url)
+                    .then(response => {
+                        this.allProducts = response.data.list;
+                        this.pageCount = Math.ceil(response.data.total / this.limit);                   
+                        
+                    })
+                    .catch(error => {
+                    })
+                    this.groupedProducts.forEach((product)=>{
+                        this.checkedProduct.push(product.id)
+                    })
+            },
+            
+            singleSelect: function (productId) {
+                   
+                    if (this.checkedProduct.length === this.products.length) {
+                        this.allSelected = true;
+                    } else {
+                        this.allSelected = false;
+                    }
+
+                },
+            verifySpace: function (event) {
+                let target = event.target;
+                var submitButton = this.$refs['saveButton'];       
+                if (this.product.name.trim() == "") {
+                    this.productNameError = '{{"wk-mp.register.blankError"|trans}}';
+                    submitButton.disabled = 'disabled';
+                } else{
+                    this.productNameError = '';
+                    submitButton.disabled = false;
+                }
+            },
+            getProductMetaData: function () {
+                let method = 'GET';
+                //let url = `${window.baseUrl}/storefront/{{context.customer.id}}/meta-product-data`;
+                let url = "{{path('frontend.marketplace.meta_product_data')}}";
+                
+                {# if (this.product.productId) {
+                    url = `${url}/${this.product.productId}`;
+                } #}
+                let productId = this.product.productId;
+                axios(url, {params: {productId}},method)
+                .then(response => {
+                    this.taxes = response.data.response.taxes.elements;
+                    this.manufacturers = response.data.response.manufacturers.elements;
+                    this.propertyGroups = response.data.response.propertyGroups;
+
+                    this.categories = this.$root.setFormattedCategories(response.data.response.categories.elements)
+                    this.rules = response.data.response.ruleCollection
+                })
+                .catch(error => {
+                })
+            },
+            updateProduct: function (event) {
+                let loader = this.$loading.show({
+                    loader: 'dots',
+                    color: '#cce3fb'
+                });
+                if(this.product.name.length > 255) {
+                    this.productNameError = '{{"wk-mp.product.create.textLengthErrorMessage"|trans}}';
+                    loader.hide();
+                    return;
+                }
+                let formFields = {};
+                let target = event.target;
+                if (!this.formError.images) {
+                    var submitButton = this.$refs['saveButton'];
+                    submitButton.disabled = 'disabled';
+
+                    let formData = new FormData(target);
+                    // set description from quill editor
+                    let description = this.quill.container.firstChild.innerHTML;
+                    description = description.substring(description.indexOf('>') + 1, description.lastIndexOf('<'));
+                    formData.append('stock', this.product.stock);
+                    formData.append('price', this.product.price);
+                    formData.append('name', this.product.name);
+                    formData.append('number', this.product.productNumber);
+                    formData.append('manufacturer', this.product.manufacturer);
+                    formData.append('tax', this.product.tax);
+                    formData.append('maxPurchase', this.product.maxPurchase);
+                    formData.append('minPurchase', this.product.minPurchase);
+                    formData.append('description', description);
+
+                    // get category
+                    let categories = '';
+                    this.product.categories.forEach((category, index) => {
+                        categories = `${categories}${category.id}`
+                        if (this.product.categories.length != index+1) {
+                            categories = `${categories}&`
+                        }
+                    });
+                    formData.append('category', categories);
+
+                    formData.append('removeCategory', this.removeCategoryList);
+                    formData.append('removeMedia', this.removeMediaList);
+                    formData.append('pricingRules',JSON.stringify(this.pricingRules));
+
+                    // get files
+                    
+                    this.productImages.forEach((file, index) => {
+                        formData.append(`images[${index}]`, file);
+                    });
+                    
+                    //get grouped products
+                    if(this.groupedproductaddon) {
+
+                        for(product in this.groupedProducts){
+                            let id = this.groupedProducts[product].id;
+                            let qty =  formData.get(`defaultQty[${this.groupedProducts[product].id}]`);
+                            this.groupedProductArray.push({productId: id, defaultQty: qty});
+                            
+                        }
+                        formData.append('groupedProductAddon',true);;
+                        formData.append('groupedProducts',JSON.stringify(this.groupedProductArray));
+                        
+                    }
+                    // send request
+                    let method = 'POST';
+                    formData.append('requestType', this.relist);
+                    this.product.productId ? formData.append('productId', this.product.productId) : '';
+                    formData.append('requestMethod', `${this.product.productId ? 'PATCH' : 'POST'}`);
+                    let url = "{{ path('frontend.marketplace.api.products', {customerId: context.customer.id})}}";
+
+                     axios({
+                        url,
+                        data: formData,
+                        method,
+                    })
+                    .then(response => {
+                        if (response.data.status) {
+                            
+                            let message = this.product.productId ? '{{"wk-mp.successMessage.productUpdateSuccess"|trans}}' : '{{"wk-mp.successMessage.productAddSuccess"|trans}}';
+
+                            this.$root.product = {};
+                            this.$root.productList = true;
+
+                            this.$root.getProducts();
+
+                            alertInfo = {
+                                alertType: 'success',
+                                alertMessage: message
+                            };
+                        } else {
+                            if (response.data.exceptionCode == 1062) {
+                                alertInfo = {
+                                    alertType: 'warning',
+                                    alertMessage: '{{"wk-mp.successMessage.duplicateProductNumberMessage"|trans}}',
+                                    timeout: "stay"
+                                }
+                            } else if(response.data.code == 400) {
+                                alertInfo = {
+                                    alertType: 'warning',
+                                    alertMessage: response.data.message,
+                                    timeout: "stay"
+                                }
+                                
+                            } else {
+                                alertInfo = {
+                                    alertType: 'danger',
+                                    alertMessage: '{{"wk-mp.successMessage.somethingWrongMessage"|trans}}',
+                                    timeout: "stay"
+                                }
+                            }
+                        }
+
+                        submitButton.disabled = false;
+                        window.storefrontAlert(alertInfo);
+                        window.scrollTo(0,0);
+                        loader.hide();
+                    })
+                    .catch(error => {
+                    })
+                }
+            },
+
+            toggleCategoryTree: function (event) {
+                if (event.target.className.search && event.target.className.search("toggle-category-tree") > -1) {
+                    event.stopPropagation();
+                    this.isViewCategoryTree = !this.isViewCategoryTree
+                }
+            },
+
+            removeCategory: function (categoryId) {
+                this.$set(this.$root.product, 'categories', this.$root.product.categories.filter(category => {
+                    let response = category.id != categoryId
+                    if (!response) {
+                        this.removeCategoryList.push(categoryId);
+                    }
+                    return response;
+                }))
+
+                // uncheck the radio button
+                let checkedRadioButtonsCollection = document.querySelectorAll('input[type=radio]:checked');
+                let checkedRadioButtonsArray = Array.from(checkedRadioButtonsCollection);
+
+                checkedRadioButtonsArray.forEach(radioButton => {
+                    if (radioButton.value == categoryId) {
+                        radioButton.checked = false;
+                    }
+                })
+            },
+
+            handleProductAddMedia: function ({target}) {
+                
+
+                this.$set(this.formError, 'images', '');
+                Array.from(target.files).forEach((file, index) => {
+                   
+                    if (this.verifyImage(file)) {
+                        this.productImages.push(file);
+                        this.product.media.push({media: {url: URL.createObjectURL(file), name: file.name}})
+                    } else {
+                        this.$set(this.formError, 'images', 'Invalid image type selected.');
+                    }
+                });
+            },
+
+            getProductGroupOptions: function ({target}) {
+                let method = 'GET';
+                let selectedGroupId = target[target.selectedIndex].value;
+                
+                let url = `${window.baseUrl}/storefront-api/variant/tree/${selectedGroupId}`;
+                
+
+                axios({url, method})
+                .then(response => {
+                    this.selectedGroupId = selectedGroupId;
+                    this.selectedGroupOptions = response.data.groupOptions.elements;
+                })
+                .catch(error => {
+                })
+            },
+
+            addGroupOption: function ({target}) {
+                this.selectedGroup = this.propertyGroups.filter(group => group.id == this.selectedGroupId)[0];
+
+                if (target.checked) {
+                    if (this.selectedGroup.selectedGroupOptions) {
+                        this.selectedGroup.selectedGroupOptions.push(target.value)
+                    } else {
+                        this.$set(this.selectedGroup, 'selectedGroupOptions', [target.value]);
+                    }
+                } else {
+                    this.$set(this.selectedGroup, 'selectedGroupOptions', this.selectedGroup.selectedGroupOptions.filter(option => option !== target.value));
+                }
+            },
+
+            isOptionSelected: function (optionId) {
+                var response = false;
+
+                this.propertyGroups.forEach((propertyGroup, index) => {
+                    if (propertyGroup.id == this.selectedGroupId) {
+                        if (this.propertyGroups[index].selectedGroupOptions && !response) {
+
+                            response = this.propertyGroups[index].selectedGroupOptions.indexOf(optionId) > -1 ? true : false;
+                        }
+                    }
+                })
+
+                return response;
+            },
+
+            updateVariantCombinations: function (event) {
+                var allValues = [];
+                
+
+                this.propertyGroups.forEach(group => {
+                    if (group.selectedGroupOptions && group.selectedGroupOptions.length) {
+                        allValues.push(group.selectedGroupOptions);
+                    }
+                });
+
+                if (allValues.length > 0) {
+                    event.target.disabled = "disabled";
+                    var variantCombination = this.getCombinatins(allValues);
+
+                    variantCombination.forEach((combination, index) => {
+                        let updatedValues = {
+                            stock: 0,
+                            parentPrice: this.product.price,
+                            parentId: this.product.productId,
+                            options: variantCombination[index],
+                            productNumber: this.product.productNumber + '.' + (index + 1),
+                        };
+
+                        variantCombination[index] = updatedValues;
+                    })
+
+                    let url = `${window.baseUrl}/storefront-api/variant/${this.product.productId}`;
+                    
+                   
+                    axios({
+                        url,
+                        method: 'POST',
+                        data: {
+                            requestMethod: 'VARIANT_LIST',
+                            variants: variantCombination,
+                        }
+                    }).then(response => {
+                        event.target.disabled = "";
+                        this.$set(this.product, 'variants', response.data.variants);
+
+                        this.formatProductVariants();
+
+                        window.storefrontAlert({
+                            alertType: 'success',
+                            alertMessage: '{{"wk-mp.successMessage.variantAddSuccess"|trans}}',
+                        });
+                    }).catch(error => {
+                        
+                    })
+                } else {
+                    window.storefrontAlert({
+                            alertType: 'warning',
+                            alertMessage: 'No variant combination selected',
+                        });
+                    window.scrollTo(0,0)
+                    this.deleteAllVariants(event);
+                }
+            },
+
+            deleteAllVariants: function (event) {
+                let url = `${window.baseUrl}/storefront-api/variant/${this.product.productId}?variantId=all`;
+                return url
+                axios({
+                    url,
+                    method: 'DELETE',
+                }).then(response => {
+                    event.target.disabled = "";
+                    this.$set(this.product, 'variants', []);
+
+                    window.storefrontAlert({
+                        alertType: 'success',
+                        alertMessage: '{{"wk-mp.successMessage.allVariantDeleteSuccess"|trans}}',
+                    });
+                }).catch(error => {
+                   
+                })
+            },
+
+            getCombinatins: function (variantsCollection = [], n = 0, result = [], current = []) {
+                if (n === variantsCollection.length) {
+                    result.push(current)
+                } else {
+                    variantsCollection[n].forEach(item => this.getCombinatins(variantsCollection, n+1, result, [...current, item]))
+                }
+
+                return result;
+            },
+
+            formatProductVariants: function () {
+                this.product.variants.forEach((variant, index) => {
+                    this.$set(this.product.variants[index], 'actionButton', variant.id);
+                    delete(this.product.variants[index].id);
+                })
+            },
+
+            changeTab: function ({target}) {
+                if (target.id == 'general') {
+                    setTimeout(()=> this.quill = new Quill('#quill-editor', {
+                    theme: 'snow'
+                    }), 2000);
+                }
+                if (target.id) {
+                    Object.keys(this.currentTab).forEach(key => this.currentTab[key] = false);
+                    this.$set(this.currentTab, target.id, true);
+                }
+            },
+
+            verifyImage: function (file) {
+                let allowedImageType = [
+                    'image/png',
+                    'image/jpg',
+                    'image/jpeg',
+                ];
+
+                let invalidExtensions = ['php', 'zip', 'htaccess', 'json', 'xml', 'csv'];
+
+                if (file.type) {
+                    isImageValidated = invalidExtensions.filter(extension => file.name.includes(extension));
+
+                    if (isImageValidated.length > 0) {
+                        return false;
+                    }
+                }
+
+                return (allowedImageType.indexOf(file.type) > -1) ? true : false;
+            },
+
+            updateTitle() {
+                if (!this.product['name']) {
+                    document.title = '{{"wk-mp.product.button.addProduct"|trans}}';
+                } else {
+                    document.title = this.product.name;
+                }
+            },
+            removeProductImage(mediaId, mediaName) {
+                if (mediaId) {
+                    this.removeMediaList.push(mediaId);
+                    
+                    this.product.media.forEach((media, index) => {
+                        if (this.product.media[index].mediaId == mediaId) {
+                            this.removeByAttr( this.product.media, 'mediaId', mediaId);   
+                        }
+                    })
+                } else {
+                    this.product.media.forEach((media, index) => {
+                        
+                        if (this.product.media[index].media.name == mediaName) {
+                            this.$delete(this.product.media, index)
+                        }
+                    })
+                    this.productImages.forEach((file, index) => {
+                        
+                        if(this.productImages[index].name == mediaName) {
+                            this.$delete(this.productImages, index);
+                        }
+                    });
+                }
+                
+            },
+            removeByAttr(arr, attr, value) {
+                var i = arr.length;
+                while(i--){
+                    if( arr[i] 
+                        && arr[i].hasOwnProperty(attr) 
+                        && (arguments.length > 2 && arr[i][attr] === value ) ){ 
+
+                        arr.splice(i,1);
+
+                    }
+                }
+                return arr;
+            },
+            addPriceRule: function(event){
+                this.isNewRule = false;
+                let addRuleButton = document.getElementById('addRuleButton');
+                if (addRuleButton) {
+                    addRuleButton.disabled = false;
+                }
+                var rule = JSON.parse(event.target.value);
+                let ruleId = rule.id;
+                let ruleName = rule.name;
+                let duplicateRule = false;
+                if (this.pricingRules.length > 0) {
+                    this.pricingRules.forEach((element) =>{
+                        if(element.ruleId == ruleId) {
+                            alert('{{"wk-mp.product.view.alreadySelectedRuleAlert"|trans}}');
+                            duplicateRule = true;
+                        }
+                        
+                    })
+                }
+                if (duplicateRule == false) {
+
+                    this.pricingRules.push({
+                        prices: [{
+                            productId: this.product.id,
+                            quantityStart: 1,
+                            quantityEnd: null,
+                            price: [{currencyId:this.product.currencyId, gross:parseFloat(this.product.price).toFixed(2), net: parseFloat(this.product.price-(this.product.price * this.product.taxEntity.taxRate)/100).toFixed(2)}]
+                        }],
+                        rule: ruleName,
+                        ruleId: ruleId
+                    })
+                }
+
+            },
+            addNewPriceRule() {
+                this.isNewRule = true;
+                let addRuleButton = document.getElementById('addRuleButton');
+                if (addRuleButton) {
+                    addRuleButton.disabled = true;
+                }
+
+            },
+            
+            addRow(pricingRule) {
+                this.pricingRules.forEach((element,index)=>{
+                    if(element.ruleId == pricingRule.ruleId) {
+                        const prices = this.pricingRules[index].prices;
+                        let lastPriceIndex = prices.length;
+                        if(prices[lastPriceIndex-1].quantityStart <= prices[lastPriceIndex-1].quantityEnd && prices[lastPriceIndex-1].quantityEnd != null) {
+                            prices.push({
+                                productId: this.product.id,
+                                quantityStart: 1 + parseInt(prices[lastPriceIndex-1].quantityEnd),
+                                quantityEnd: null,
+                                price: [{currencyId:this.product.currencyId, gross:parseFloat(this.product.price).toFixed(2), net: parseFloat(this.product.price-(this.product.price * this.product.taxEntity.taxRate)/100).toFixed(2)}]
+
+                            })
+                        } else {
+                            alert('{{"wk-mp.product.view.quantityValidationAlert"|trans}}');
+                        }
+                    }
+                })
+            },
+            removeRow(ruleId,key) {
+                
+                this.pricingRules.forEach((element,index)=>{
+                    if(element.ruleId == ruleId) {
+                        if (this.pricingRules[index].prices.length == 1) {
+                            alert('At least one price tier needed.Try deleting the entire pricing rule instead.');
+                            return;
+                        }
+                        this.pricingRules[index].prices[key-1].quantityEnd = this.pricingRules[index].prices[key].quantityEnd;
+                        this.pricingRules[index].prices.splice(key,1);
+                    }
+                })
+            },
+            deleteRule(ruleId) {
+                if(confirm("Do you really want to delete?")){
+                    this.pricingRules.forEach((element,index)=>{
+                        if(element.ruleId == ruleId) {
+                            this.pricingRules.splice(index,1);
+                        }
+                    })
+                }
+            },
+            
+            changePriceRule(event) {
+                var value = JSON.parse(event.target.value);
+                let duplicateRule = false;
+                this.pricingRules.forEach((element,index) => {
+                    if(element.ruleId == value.id) {
+                        alert('{{"wk-mp.product.view.alreadySelectedRuleAlert"|trans}}');
+                        duplicateRule = true;
+                    }
+                    if(value.ruleIndex == index && duplicateRule == false) {
+                        this.pricingRules[index].rule = value.name;
+                        this.pricingRules[index].ruleId = value.id;
+                    }
+                })
+            },
+            calculateNetPrice(event,pricingRule,key) {
+                let netPrice = 0;
+                if(event.target.value > 0) {
+                    netPrice = (parseInt(event.target.value)-(parseInt(event.target.value)*parseInt(this.product.taxEntity.taxRate))/100).toFixed(2);
+                }
+                this.pricingRules.forEach((element,index)=>{
+                    if(element.ruleId == pricingRule.ruleId) { 
+                        const prices = this.pricingRules[index].prices;
+                        prices[key].price[0].net = netPrice;
+
+                    }
+
+                })
+               
+            },
+            calculateGrossPrice(event,pricingRule,key) {
+                let grossPrice = 0;
+                if(event.target.value > 0) {
+                    grossPrice = (parseInt(event.target.value)+(parseInt(event.target.value)*parseInt(this.product.taxEntity.taxRate))/100).toFixed(2);
+                }
+                this.pricingRules.forEach((element,index)=>{
+                    if(element.ruleId == pricingRule.ruleId) { 
+                        const prices = this.pricingRules[index].prices;
+                        prices[key].price[0].gross = grossPrice;
+
+                    }
+
+                })
+               
+            }
+            
+        },
+
+        created() {
+            this.updateTitle();
+            this.getProductMetaData();
+        },
+
+        delimiters: ['~', '~']
+    })
+</script>

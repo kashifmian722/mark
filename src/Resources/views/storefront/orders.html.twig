@@ -1,0 +1,366 @@
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
+
+{% block page_account_main_content %}
+    <style>
+        .order-item-detail {
+            width: 100%;
+        }
+
+        .last-table-head {
+            text-align: right;
+        }
+        
+        .order-wrapper .row {
+            padding: 10px 0;
+            border-bottom: 1px solid #d4e2e2;
+        }
+        .order-wrapper .row:last-child {
+            border-bottom: unset;
+        }
+    </style>
+
+    <div id="app"></div>
+
+    <template id="order-list-template">
+        <div>
+            <div class="marketplace-orders">
+                <div class="account-welcome">
+                    <h1>{{"wk-mp.order.headerTitle"|trans}}</h1>
+                    <p>{{"wk-mp.order.headerDescription"|trans}}</p>
+                </div>
+
+                <div class="account-orders-main">
+                    <div class="account-orders-overview">
+                        <div class="table order-table">
+                            <div class="order-table-header">
+                                <div class="row">
+                                    <div class="col">{{"wk-mp.order.dateColumn"|trans}}</div>
+                                    <div class="col">{{"wk-mp.order.orderNumberColumn"|trans}}</div>
+                                    <div class="col">{{"wk-mp.order.orderStatusColumn"|trans}}</div>
+                                    <div class="col">{{"wk-mp.order.paymentStatusColumn"|trans}}</div>
+                                    <div class="col last-table-head">{{"wk-mp.order.actionColumn"|trans}}</div>
+                                </div>
+                            </div>
+
+                            <div class="product-table-body" data-product-detail-loader="true">
+                                <div class="order-wrapper">
+                                    <div class="row" style="margin-left:0px;margin-right:0px" v-for="(order, index) in orders" :key="index">
+                                        <div class="col-12 col-md order-item order-item-date">
+                                            <span class="order-item-value order-item-date-value">~order.date~</span>
+                                        </div>
+
+                                        <div class="col-12 col-md order-item order-item-date">
+                                            <span class="order-item-value order-item-number-value">~order.orderNumber~</span>
+                                        </div>
+
+                                        <div class="col-12 col-md order-item order-item-payment-method">
+                                            <span class="order-item-value order-item-payment-method-value">~order.orderStatus~</span>
+                                        </div>
+
+                                        <div class="col-12 col-md order-item order-item-payment-method">
+                                            <span class="order-item-value order-item-payment-method-value">~order.paymentStatus~</span>
+                                        </div>
+
+                                        <div class="col-12 col-md order-item order-item-actions">
+                                            <button class="btn btn-light btn-sm order-hide-btn collapsed" type="button" @click="viewOrder(order.id)">
+                                                <span class="order-view-btn-text" v-text="isViewOrder[order.id] ? 'HIDE' : 'VIEW'"></span>
+                                            </button>
+                                        </div>
+
+                                        <div class="order-item-detail" v-if="isViewOrder[order.id]">
+                                            <div class="collapse show">
+                                                <div class="order-detail-content">
+                                                    <div class="order-detail-content-header">
+                                                        <div class="row">
+                                                            <div class="col-sm-6">{{"wk-mp.order.product"|trans}}</div>
+                                                            <div class="col-sm-2">{{"wk-mp.order.quantity"|trans}}</div>
+                                                            <div class="col-sm-2">{{"wk-mp.order.unitPrice"|trans}}</div>
+                                                            <div class="col-sm-2">{{"wk-mp.order.subTotal"|trans}}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="order-detail-content-body">
+                                                        <div class="order-item-detail-list-item order-detail-item-product">
+                                                            <div class="row order-detail-content-row">
+                                                                <div class="col-12 col-md-2 order-item order-item-image">
+                                                                    <div class="order-item-product-image">
+                                                                        <a :href=`${window.baseUrl}/detail/${order.productId}` class="product-image-link"
+                                                                            :title="order.name">
+                                                                            <img :src="order.cover ? order.cover : `${defaultImagePath}`"
+                                                                                class="img-fluid order-item-img product-image" :alt="order.name"/>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-12 col-md-4 order-item order-item-name">
+                                                                    <a :href=`${window.baseUrl}/detail/${order.productId}` class="order-item-product-name" :title="order.name">
+                                                                        <strong class="name-value">~order.name~</strong>
+
+                                                                        <div class="order-item-variants" v-if="order.variants">
+                                                                            <div class="order-item-variants-properties" v-for="variant in order.variants">
+                                                                                <div class="order-item-variants-properties-name">~variant.group~:</div>
+                                                                                <div class="order-item-variants-properties-value">~variant.option~</div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </a>
+                                                                </div>
+
+                                                                <div class="col-12 col-md-2 order-item order-item-quantity">
+                                                                    <span class="order-item-value order-item-quantity-value">~order.quantity~</span>
+                                                                </div>
+
+                                                                <div class="col-12 col-md-2 order-item order-item-price">
+                                                                    <span class="order-item-value order-item-price-value">~order.currencySymbol~~order.price.toFixed(2)~</span>
+                                                                </div>
+                                                                <div class="col-12 col-md-2 order-item order-item-subtotal">
+                                                                    <span class="order-item-value order-item-price-value">~order.currencySymbol~~(order.quantity*order.price).toFixed(2)~</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="order-detail-content-footer">
+                                                        <div class="order-item-detail-footer">
+                                                            <div class="row no-gutters">
+                                                                <div class="col-12 col-md-7 col-xl-6">
+                                                                    <dl class="row no-gutters order-item-detail-labels">
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.customerName"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~order.customerName~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.customerEmail"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~order.customerEmail~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.paymentMethod"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~orderMetaData.paymentMethod~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.shippingMethod"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~orderMetaData.shippingMethod~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.billingAddressLabel"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7" v-if="order.orderAddress[0]">
+                                                                            <div>~order.orderAddress[0].company~</div>
+                                                                            <div>~order.orderAddress[0].firstName~ ~order.orderAddress[0].lastName~</div>
+                                                                            <div>~order.orderAddress[0].street~</div>
+                                                                            <div>~order.orderAddress[0].zipcode~ ~order.orderAddress[0].city~</div>
+                                                                            <div>~order.orderAddress[0].country.name~</div>
+                                                                            <div v-if="order.orderAddress[0].countryState">~order.orderAddress[0].countryState.name~</div>
+                                                                        </dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.shippingAddressLabel"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7" v-if="order.orderAddress[1]">
+                                                                            <div>~order.orderAddress[1].company~</div>
+                                                                            <div>~order.orderAddress[1].firstName~ ~order.orderAddress[1].lastName~</div>
+                                                                            <div>~order.orderAddress[1].street~</div>
+                                                                            <div>~order.orderAddress[1].zipcode~ ~order.orderAddress[1].city~</div>
+                                                                            <div>~order.orderAddress[1].country.name~</div>
+                                                                            <div v-if="order.orderAddress[1].countryState">~order.orderAddress[1].countryState.name~</div>
+                                                                        </dd>
+                                                                        <dd class="col-6 col-md-7" v-else>{{"wk-mp.order.identicalMessage"|trans}}</dd>
+                                                                    </dl>
+                                                                </div>
+
+                                                                <div class="col-12 col-md-7 col-xl-6">
+                                                                    <dl class="row no-gutters order-item-detail-labels">
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.commissionAmount"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~order.currencySymbol~~order.commission.toFixed(2)~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.sellerEarnings"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~order.currencySymbol~~order.earning.toFixed(2)~</dd>
+                                                                        <dt class="col-6 col-md-5">{{"wk-mp.order.totalGross"|trans}}</dt>
+                                                                        <dd class="col-6 col-md-7">~order.currencySymbol~~order.sum.toFixed(2)~</dd>
+                                                                        <dt class="col-6 col-md-5">Shiiping Method:</dt>
+                                                                        <dd class="col-6 col-md-7">~order.shippingMethodName~</dd>
+                                                                        <dt class="col-6 col-md-5">Payment Method:</dt>
+                                                                        <dd class="col-6 col-md-7">~order.paymentMethodName~</dd>
+                                                                        <dt class="col-6 col-md-5">Shipping costs:</dt>
+                                                                        <dd class="col-6 col-md-7">~order.currencySymbol~~order.shippingCost.toFixed(2)~</dd>
+                                                                    </dl>
+                                                                        <button v-if="!order.dhlLabel && order.dhlShipping" title="{{"wk-mp.order.createShippingLabelButton"|trans}}" class="btn btn-primary btn-sm" type="button" @click="createShippingLabel(order.orderNumber,order.productId,order.quantity,order.sum)" style="float:right;">
+                                                                            <span class="dhl-shipping-btn-text">{{"wk-mp.order.createShippingLabelButton"|trans}}</span>
+                                                                        </button>
+                                                                </div>
+                                                            </div>
+                                                            <label class="form-label"  v-if="manageOrderStatus">{{"wk-mp.order.updateOrderLabel"|trans}}</label>
+                                                            <div class="row no-gutters" v-if="manageOrderStatus">
+                                                                <div class="col-12 col-md-6">
+                                                                <select class="custom-select" name="orderStatus" v-model="order.lineItemStateId" :required="'required'">
+                                                                        <option v-for="state in orderState" :key="state._uniqueIdentifier" :value="state.stateMachineStateId" >~state.name~</option>
+                                                                </select>
+                                                                </div>
+                                                                <div class="col-12 col-md-3">
+                                                                    <button class="btn btn-light btn-sm" type="button" @click="updateOrder(order.marketplaceOrderId,order.lineItemStateId)">
+                                                                        <span class="order-update-btn-text">{{"wk-mp.order.updateButton"|trans}}</span>
+                                                                    </button>
+                                                                </div>
+                                                                 
+                                                            </div>
+                                                            
+                                                            <div class="row no-gutters" v-if="order.dhlLabel">
+                                                                <div class="col-12 col-md-3 mb-2">
+                                                                    <a :href=`${window.baseUrl}/dhl-shipping-label/${order.orderNumber}/${order.productId}.pdf` class="btn btn-primary" title="{{"wk-mp.order.downloadShippingLabelTitle"|trans}}" download>{% sw_icon 'circle-download' %}{{"wk-mp.order.downloadButton"|trans}}</a>
+                                                                </div>
+                                                                <div class="col-12 col-md-3">
+                                                                    <a :href=`${window.baseUrl}/dhl-shipping-label/${order.orderNumber}/${order.productId}.pdf` class="btn btn-primary" title="{{"wk-mp.order.printShippingLabelTitle"|trans}}" @click="printLabel" target="_blank">{% sw_icon 'printer' %}{{"wk-mp.order.printButton"|trans}}</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-if="orders && orders.length <= 0" style="padding: 10px;">{{"wk-mp.order.notFound"|trans}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <paginate
+                        v-if="pageCount && (pageCount - 1)"
+                        v-model="page"
+                        :page-count="pageCount"
+                        :click-handler="paginate"
+                        :prev-text="'Prev'"
+                        :next-text="'Next'"
+                        :container-class="'pagination'">
+                    </paginate>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script type="application/javascript">
+        (() => {
+            Vue.use(VueRouter)
+            Vue.component('paginate', VuejsPaginate);
+            Vue.use(VueLoading);
+            Vue.component('loading', VueLoading);
+            const router = new VueRouter({})
+
+            new Vue({
+                router,
+                el: '#app',
+                template: '#order-list-template',
+
+                data: function () {
+                    return {
+                        'limit': 10,
+                        'pageCount': 0,
+                        'orders': null,
+                        'window': window,
+                        'environment': '{{ environment }}',
+                        'isViewOrder': {},
+                        'orderMetaData': {},
+                        'orderState' : {},
+                        'page': this.$route.query.page ? parseInt(this.$route.query.page) : 1,
+                        'defaultImagePath': `${window.baseUrl}/bundles/webkulmvmarketplace/storefront/seller-profile/default/default.svg`,
+                        'manageOrderStatus': false,
+                        'customerId': '{{context.customer.id}}',
+                        'dhlAddon': false
+                    }
+                },
+
+                beforeMount: function () {
+                    this.getOrders();
+                },
+
+                watch: {
+                    '$route.query.page': function () {
+                        this.getOrders()
+                    }
+                },
+
+                methods: {
+                    printLabel: function () {
+                        var newWin = window.frames[0];
+                        newWin.document.write('<body onload="window.print()"><iframe style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;" src=""></body>');
+                        newWin.document.close();
+                    },
+                    createShippingLabel: function (orderNumber, productId, quantity, productPrice) {
+                       if(this.dhlAddon){
+                            let loader = this.$loading.show({
+                                loader: 'dots',
+                                color: '#cce3fb'
+                            });
+                            let url = `${window.baseUrl}/marketplace/shipping-label`;
+                            let method = 'POST';
+                            axios({url,method, data: {'orderNumber': orderNumber, 'productId': productId, 'quantity': quantity, 'productPrice': productPrice}})
+                            .then(response => {
+                            if(response.data.error){
+                                window.storefrontAlert({
+                                alertType: 'danger',
+                                alertMessage: response.data.error,
+                                });
+                            } else if(response.data.warning){
+                                 window.storefrontAlert({
+                                alertType: 'warning',
+                                alertMessage: response.data.warning,
+                                });
+                            } else {
+                                window.storefrontAlert({
+                                alertType: 'success',
+                                alertMessage: response.data.success,
+                                });
+                            }
+                            loader.hide()
+                            window.scrollTo(0,0);
+                            this.getOrders();
+                            })
+                            .catch(error => {
+                            })
+                        }
+                    },
+                    updateOrder: function (orderId, orderStateId) {
+                        let loader = this.$loading.show({
+                            loader: 'dots',
+                            color: '#cce3fb'
+                        });
+                       let url = `${window.baseUrl}/storefront-api/{{ context.customer.id }}/orders?page=${this.page}&limit=${this.limit}`;
+                       let method = 'PATCH';
+                         axios({url,method, data: {'mpOrderId': orderId, 'orderStateId': orderStateId}})
+                        .then(response => {
+                             this.getOrders();
+                            window.storefrontAlert({
+                                alertType: 'success',
+                                alertMessage: '{{"wk-mp.order.updateOrderStatusSuccessMessage"|trans}}',
+                            });
+                            loader.hide()
+                            window.scrollTo(0,0);
+                        })
+                        .catch(error => {
+                        })
+                    },
+                    getOrders: function () {
+                        let url = `${window.baseUrl}/storefront-api/{{ context.customer.id }}/orders?page=${this.page}&limit=${this.limit}`;
+
+                        axios.get(url)
+                        .then(response => {
+                            this.pageCount = Math.ceil(response.data.total / this.limit);
+                            this.orders = response.data.orders;
+                            this.dhlAddon = response.data.dhlPlugin;
+                            console.log(this.orders)
+                            this.orderState = response.data.orderState
+                            this.manageOrderStatus = response.data.manageOrderStatus
+                            
+
+                            this.orderMetaData = {
+                                'paymentMethod': response.data.paymentMethod,
+                                'shippingMethod': response.data.shippingMethod,
+                            }
+                        })
+                        .catch(error => {
+                        })
+                    },
+
+                    viewOrder: function (orderId) {
+                        this.$set(this.isViewOrder, orderId, !this.isViewOrder[orderId]);
+                    },
+
+                    paginate: function () {
+                        this.$router.push({ query: { page: this.page }})
+                    }
+                },
+
+                delimiters: ['~', '~']
+            })
+
+        })();
+    </script>
+{% endblock %}

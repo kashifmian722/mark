@@ -1,0 +1,36 @@
+{
+    "wk-mp-config": {
+        "label": {
+            "smartBarHeading": "Konfiguration der Marketplace-Landingpage",
+            "saveButtonText": "Speichern",
+            "headTitle": "Titel der Marktplatz-Landingpage",
+            "bannerImageTitle": "Bannerbild",
+            "displayBannerLabel": "Banner anzeigen",
+            "bannerContentLabel": "Banner-Inhalt",
+            "pageLabel1": "Marktplatz-Landingpage-Label1",
+            "pageLabel2": "Marktplatz-Landingpage-Label2",
+            "pageLabel3": "Marktplatz-Landingpage-Label3",
+            "pageLabel4": "Marktplatz-Landingpage-Label4",
+            "landingPageButtonLabel": "Label der Marktplatz-Landingpage-Schaltfläche",
+            "displayIcon": "Bildschirmsymbol",
+            "feature1IconMedia": "Funktion:1 Symbol",
+            "feature2IconMedia": "Funktion:2 Symbol",
+            "feature3IconMedia": "Funktion:3 Symbol",
+            "feature4IconMedia": "Funktion:4 Symbol",
+            "feature1IconLabel": "Funktion:1 Icon-Label",
+            "feature2IconLabel": "Funktion:2 Icon-Label",
+            "feature3IconLabel": "Funktion:3 Icon-Label",
+            "feature4IconLabel": "Feature:4 Icon-Label",
+            "aboutMarketplaceLabel": "Über Marktplatz",
+            "salesChannelLabel": "Verkaufskanal",
+            "orderCardTitle": "Bestelleinstellungen",
+            "manageOrderStatusLabel": "Bestellstatus verwalten",
+            "orderStatusLable": "Bestellstatus für Verkäufer",
+            "completeOrderStatusLabel": "Complete Order Status",
+            "cancelOrderStatusLabel": "Cancel Order Status",
+            "successTitle": "Erfolg",
+            "successMessage": "Einstellungen erfolgreich gespeichert",
+            "sellerListingTopHeadingLabel": "Seller listing top heading"
+        }
+    }
+}

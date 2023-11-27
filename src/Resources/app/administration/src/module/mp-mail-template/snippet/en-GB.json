@@ -1,0 +1,18 @@
+{
+    "mp-mail":{
+        "general": {
+            "mainMenuItemList": "Marketplace Mail Template",
+            "descriptionTextModule": "Marketplace mail template`"
+        },
+
+
+        "list": {
+            "nameColumn": "Name",
+            "subjectColumn": "Subject",
+            "messageColumn": "Message",
+            "titleSaveSuccess": "Success",
+            "messageSaveSuccess": "Template updated successfully"
+            
+        }
+    }
+}

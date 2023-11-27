@@ -1,0 +1,143 @@
+<div class="top-bar-nav-item">
+    <a href="{{ path('frontend.marketplace.storefront.sell') }}"
+        title="{{ "wk-mp.header.sellLinkTitle"|trans|striptags }}"
+        class="nav-link main-navigation-link">
+        {{ "wk-mp.header.sellLinkTitle"|trans|sw_sanitize }}
+    </a>
+</div>
+    {# <div class="marketplace-menu dropdown show">
+        <button class="btn dropdown-toggle top-bar-nav-btn" type="button" id="marketplace-top-bar"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class="top-bar-nav-text" style="display: inline-block">{{"wk-mp.header.marketplaceText"|trans}}</span>
+        </button>
+
+        <div id="app"></div>
+    </div> #}
+
+
+{# <script type="text/javascript">
+    (() => {
+        new Vue({
+            el: "#app",
+
+            template: `
+            <div class="top-bar-list dropdown-menu dropdown-menu-right">
+                <div v-if="sessionSeller" id="marketplace_sidebar">
+                    <div v-if="isSellerApproved">
+                        <a href="{{ path('frontend.marketplace.product.add') }}"
+                        title="{{"wk-mp.product.button.addProduct"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.product.button.addProduct"|trans}}
+                        </a>
+
+                        <a href="{{ path('frontend.marketplace.seller.profile') }}"
+                        title="{{"wk-mp.sidebar.sellerProfile"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.sellerProfile"|trans}}
+                        </a>
+
+                        <a href="{{ path('frontend.marketplace.products') }}"
+                        title="{{"wk-mp.sidebar.sellerProducts"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                         {{"wk-mp.sidebar.sellerProducts"|trans}}
+                        </a>
+
+                        <a href="{{ path('frontend.marketplace.orders') }}"
+                        title="{{"wk-mp.sidebar.sellerOrders"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.sellerOrders"|trans}}
+                        </a>
+
+                        <a href="{{ path('frontend.marketplace.sellers') }}"
+                        title="{{"wk-mp.sidebar.marketplaceSellers"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.marketplaceSellers"|trans}}
+                        </a>
+                    </div>
+
+                    <div v-else-if="isSellerApplied">
+                        <span
+                        title="{{"wk-mp.header.appliedForMarketplaceTitle"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.appliedSellership"|trans}}
+                        </span>
+
+
+                        <a href="{{ path('frontend.marketplace.sellers') }}"
+                        title="{{"wk-mp.sidebar.marketplaceSellers"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.marketplaceSellers"|trans}}
+                        </a>
+                    </div>
+
+                    <div v-else-if="!isSellerApplied">
+                        <a @click="becomeSellerAction" href=""
+                        title="{{"wk-mp.header.applyForSellerTitle"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.applySellership"|trans}}
+                        </a>
+
+
+                        <a href="{{ path('frontend.marketplace.sellers') }}"
+                        title="{{"wk-mp.sidebar.marketplaceSellers"|trans}}"
+                        class="list-group-item list-group-item-action account-aside-item">
+                            {{"wk-mp.sidebar.marketplaceSellers"|trans}}
+                        </a>
+                    </div>
+                </div>
+
+                <div v-else id="marketplace_sidebar">
+                    <a href="{{ path('frontend.marketplace.sellers') }}"
+                    title="{{"wk-mp.sidebar.marketplaceSellers"|trans}}"
+                    class="list-group-item list-group-item-action account-aside-item">
+                        {{"wk-mp.sidebar.marketplaceSellers"|trans}}
+                    </a>
+                </div>
+            </div>`,
+
+            data: function () {
+                window.isStatusUpdated = (typeof(window.isStatusUpdated) != "undefined") ? true : false;
+
+                return {
+                    isSellerApplied: false,
+                    isSellerApproved: false,
+                    sessionSeller: "{{ context.customer and context.customer.id }}",
+                }
+            },
+
+            beforeMount: function () {
+                this.fetchConfigurationDetails();
+            },
+
+            methods: {
+                fetchConfigurationDetails: function () {
+                    if (this.sessionSeller) {
+                        axios.get("{{ path('frontend.marketplace.api.fetch.configuration', {'customerId': context.customer.id }) }}")
+                        .then(response => {
+                            this.isSellerApplied = response.data.result.isSellerApplied;
+                            this.isSellerApproved = response.data.result.isSellerApproved;
+                        })
+                        .catch(error => this.storefrontAlert({alertType: 'danger', alertMessage: '{{"wk-mp.successMessage.somethingWrongMessage"|trans}}'}))
+                    }
+                },
+
+                becomeSellerAction: function (event) {
+                    event.preventDefault();
+
+                    axios.post("{{ path('frontend.marketplace.api.store.configuration') }}", {
+                        'sellershipStatus': true,
+                        'customerId': "{{ context.customer.id }}",
+                    })
+                    .then(response => {
+                        this.isSellerApplied = true;
+                        window.storefrontAlert({alertType: 'success', alertMessage: '{{"wk-mp.successMessage.appliedForSelershipMessage"|trans}}'});
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        window.storefrontAlert({alertType: 'danger', alertMessage: '{{"wk-mp.successMessage.somethingWrongMessage"|trans}}'});
+                    })
+                },
+            }
+        })
+    })()
+</script> #}

@@ -1,0 +1,123 @@
+{% sw_extends '@Storefront/storefront/component/account/register.html.twig' %}
+
+{% block component_account_register_personal_fields %}
+    {{ parent() }}
+    {% if config('WebkulMVMarketplace.config.status') %}
+    <div id="app"></div>
+
+    <template id="register-template">
+        <div>
+            <div class="form-row">
+                <div class="form-group col-md-6 col-sm-6">
+                    <label class="form-label" for="personalSalutation">{{"wk-mp.register.becomeSellerText"|trans}}</label>
+                    <select id="sellerRequest" class="custom-select" name="sellerRequest" required="required" @change="updateView" v-model="isBecomeSeller">
+                        <option  value="true">Yes</option>
+                        <option selected="selected" value="false">No</option>
+                    </select>
+                </div>
+                 <div class="form-group col-md-6 col-sm-6" v-if="isBecomeSeller">
+                    <label class="form-label" for="seller-type">{{"wk-mp.register.iamText"|trans}}*</label>
+                    <select id="seller-type" class="custom-select" name="sellerType" required="required" v-model="sellerType">
+                        <option selected="selected" value="0">{{"wk-mp.register.privateClientText"|trans}}</option>
+                        <option selected="selected" value="1">{{"wk-mp.register.companyText"|trans}}</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="form-row" v-if="isBecomeSeller">
+                <div class="form-group col-sm-6">
+                    <label class="form-label" for="store-url">{{"wk-mp.register.storeSlugText"|trans}}*</label>
+                    <input type="text" class="form-control" id="store-url" placeholder="john-doe" name="storeSlug" required="required" @change="verifySlug" v-model="selectedSlug" maxlength="50">
+                    <span class="error">~slugError~</span>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label class="form-label" for="store-title">{{"wk-mp.register.storeTitleText"|trans}}*</label>
+                    <input type="text" class="form-control" id="store-title" placeholder="john-doe" name="storeTitle" required="required" @change="verifyLength" v-model="selectedTitle" maxlength="255">
+                    <span class="error">~titleError~</span>
+                </div>
+
+                {# <div class="form-group col-sm-6">
+                    <label class="form-label" for="store-description">{{"wk-mp.register.storeDescriptionText"|trans}}*</label>
+                    <textarea class="form-control" id="store-description" placeholder="john-doe" name="storeDescription" required="required" v-model="selectedDescription" @change="verifyLength" maxlength="255"></textarea>
+                    <span class="error">~descriptionError~</span>
+                </div> #}
+            </div>
+        </div>
+    </template>
+
+    <script type="text/javascript">
+        (() => {
+            new Vue({
+                el: '#app',
+                template: '#register-template',
+                data: function () {
+                    return {
+                        'slugError': '',
+                        'titleError': '',
+                        'descriptionError': '',
+                        'selectedSlug': '',
+                        'selectedTitle': '',
+                        'selectedDescription': '',
+                        'isBecomeSeller': false,
+                        'sellerType': 0
+                    }
+                },
+
+                methods: {
+                    updateView: function ({target}) {
+                        this.isBecomeSeller = target.value == "true" ? true : false;
+                    },
+
+                    verifySlug: function () {
+                        this.slugFormation();
+                       
+                        let method = "GET";
+                        let url = `${window.baseUrl}/storefront-api/verify-slug/${this.selectedSlug}`;
+
+                        axios({
+                            url, method
+                        }).then(response => {
+                            if (!response.data.status) {
+                                this.slugError = `'${this.selectedSlug}' {{"wk-mp.register.verifySlugError"|trans}} `
+                                this.selectedSlug = '';
+                            } else {
+                                this.slugError = '';
+                            }
+                        })
+                    },
+
+                    slugFormation: function () {
+                        this.selectedSlug = this.selectedSlug.toLowerCase();
+                        this.selectedSlug = this.selectedSlug.replace(/ /g, "-");
+                    },
+                    verifyLength: function () {
+                        if (this.selectedTitle.length >255) {
+                            this.titleError = '{{"wk-mp.register.titleLengthError"|trans}}';
+                            this.selectedTitle = '';
+                        } else{
+                             this.titleError = '';
+                        }
+                        
+                        if (this.selectedTitle.trim() == '') {
+                            this.titleError = '{{"wk-mp.register.blankError"|trans}}';
+                        } else {
+                            this.titleError = '';
+                            submitButton.disabled = false;
+                        }
+                        if (this.selectedDescription.trim() == '') {
+                            this.descriptionError = '{{"wk-mp.register.blankError"|trans}}';
+                        } else {
+                            this.descriptionError = '';
+                        }
+                    }
+                },
+
+                delimiters: ['~', '~']
+            })
+        })()
+    </script>
+    {% endif %}
+
+{% endblock %}

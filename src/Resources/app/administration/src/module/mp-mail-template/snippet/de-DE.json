@@ -1,0 +1,18 @@
+{
+    "mp-mail":{
+        "general": {
+            "mainMenuItemList": "Marktplatz Mail-Vorlage",
+            "descriptionTextModule": "Mail-Vorlage für den Marktplatz"
+        },
+
+
+        "list": {
+            "nameColumn": "Name",
+            "subjectColumn": "Gegenstand",
+            "messageColumn": "Botschaft",
+            "titleSaveSuccess": "Erfolg",
+            "messageSaveSuccess": "Vorlage erfolgreich aktualisiert"
+            
+        }
+    }
+}

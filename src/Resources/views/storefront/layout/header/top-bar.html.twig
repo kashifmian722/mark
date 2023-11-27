@@ -1,0 +1,9 @@
+{% sw_extends '@Storefront/storefront/layout/header/top-bar.html.twig' %}
+
+{% block layout_header_top_bar_language %}
+    {% if config('WebkulMVMarketplace.config.status') %}
+    {% sw_include '@WebkulMVMarketplace/storefront/layout/header/actions/mp-header.html.twig' %}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}

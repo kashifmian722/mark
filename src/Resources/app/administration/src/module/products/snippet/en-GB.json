@@ -1,0 +1,43 @@
+{
+    "mp-product": {
+        "general": {
+            "mainMenuItemGeneral": "Marketplace Products",
+            "descriptionTextModule": "Manage your marketplace products here",
+            "mainMenuItemList": "Products",
+            "productIcon": "default-symbol-products",
+            "mainMenuItemListHeading": "Manage Seller's Products"
+        },
+        "list": {
+            "details": "",
+            "messageEmpty": "No products yet.",
+            "columnCollection": ["Product Title", "Seller's Name", "Seller's Email", "Price", "Stock", "Status", "Product View"],
+            "titleSaveSuccess": "Success",
+            "messageSaveSuccess": "Product has been updated.",
+            "titleSaveError": "Error",
+            "messageSaveError": "Unfortunately something went wrong.",
+            "approveText": "Approve",
+            "disapproveText": "Disapprove",
+            "messageDeleteSuccess": "Product deleted suceesfully",
+            "addProductLabel": "Add Product"
+        },
+        "detail": {
+            "nameLabel": "Name",
+            "cancelButtonText": "Cancel",
+            "saveButtonText": "Save Settings",
+            "errorTitle": "Error saving the bundle",
+            "absoluteText": "Absolute",
+            "percentageText": "Percentage",
+            "sellerButtonText": "Sellers",
+            "productsButtonText": "Products",
+            "ordersButtonText": "Orders",
+            "selectProductLabel": "Select Products",
+            "selectSellerLabel": "Select Seller",
+            "selectSellerPlacehoder": "Select a seller to assign products",
+            "successTitle": "Success",
+            "assignProductSuccessMessage": "Product assigned successfully",
+            "infoTitle": "Info",
+            "selectProductMessage": "Please select the products",
+            "selectSellerMessage": "Please select the seller"
+        }
+    }
+}

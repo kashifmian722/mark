@@ -1,0 +1,84 @@
+<template id="add-review-template">
+    <div class="add-review-form-container">
+        <div class="seller--stars">
+            <i
+                class="mp-icon mp-review--star editable"
+                v-for="index in 5"
+                :key="index"
+                v-text="index > starRating ? '&#9734;' : '&#9733;'"
+                @click="starRating = index"
+            ></i>
+        </div>
+
+        <form @submit.prevent="submitReview">
+            <div class="add-review-form-wrapper">
+                <div>
+                    <label>
+                        <span class="asterisk">*</span>
+                        <span>{{"wk-mp.review.summary"|trans}}</span>
+                    </label>
+                    <input type="text" name="reviewTitle" v-model="reviewTitle" required="required" maxlength="50" />
+                </div>
+                <div class="review-description">
+                    <label>
+                        <span class="asterisk">*</span>
+                        <span>{{"wk-mp.review.reviewTxt"|trans}}</span>
+                    </label>
+                    <textarea v-model="reviewDescription" style="height: 150px" required="required" maxlength="1000"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary review-submit-btn">
+                <span class="review-view-btn-text">{{"wk-mp.review.submitButton"|trans}}</span>
+            </button>
+        </form>
+    </div>
+</template>
+
+<script type="text/javascript">
+
+    Vue.component('add-review', {
+        template: '#add-review-template',
+        data: function () {
+            return {
+                'starRating': 1,
+                'reviewTitle': '',
+                'reviewDescription': '',
+            }
+        },
+
+        methods: {
+            submitReview: function () {
+                {% if context.customer and context.customer.id %}
+                    let data = {
+                        starRating: this.starRating,
+                        reviewTitle: this.reviewTitle,
+                        reviewDescription: this.reviewDescription,
+                    };
+
+                    let url = `{{ path('frontend.marketplace.api.profile.review', {
+                                reviewerId: context.customer.id,
+                                storeOwnerId: app.request.get('customerId')
+                            }) }}`;
+
+                    axios.post(url, data)
+                    .then(response => {
+                        this.$root.sellerReviews = response.data.reviewsCollection;
+                        this.$root.reviewForm = false;
+
+                        window.storefrontAlert({
+                            alertType: 'success',
+                            alertMessage: 'Your review is successfully submitted!',
+                        })
+                    })
+                    .catch(error => {
+                        
+                    })
+                {% endif %}
+            }
+        },
+
+        delimiters: ['~', '~']
+    })
+
+</script>

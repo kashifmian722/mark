@@ -1,0 +1,107 @@
+{% sw_extends '@Storefront/storefront/page/account/_page.html.twig' %}
+
+{% block page_account_main_content %}
+    <div id="app"></div>
+    <template id="earning-template">
+        <div>
+        <div class="account-welcome">
+            <h1>{{"wk-mp.sidebar.earningLabel"|trans}}</h1>
+        </div>
+        <form @submit.prevent="getFilter">
+            <div class="form-group">
+                <label class="form-label" for="period">{{"wk-mp.earningPage.periodFormLabel"|trans}}:</label>
+                <select class="form-control" name="period" v-model="period">
+                    <option value="day">{{"wk-mp.earningPage.dayOptionLabel"|trans}}</option>
+                    <option value="month">{{"wk-mp.earningPage.monthOptionLabel"|trans}}</option>
+                    <option value="year">{{"wk-mp.earningPage.yearOptionLabel"|trans}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="from">{{"wk-mp.earningPage.fromFormLabel"|trans}}:</label>
+                <input type="date" class="form-control" name="from" v-model="from"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="to">{{"wk-mp.earningPage.toFormLabel"|trans}}:</label>
+                <input type="date" class="form-control" name="to" v-model="to"/>
+            </div>
+            <button class="btn btn-primary" type="submit">{{"wk-mp.earningPage.filterButtonText"|trans}}</button>
+        </form>
+        <div class="sale-chart"  style="padding:20px" v-if="saleGraphData">
+            <div class="graph-title"> {{"wk-mp.dashboard.turnoverGraph"|trans}} </div>
+            <column-chart v-if="currency" :prefix="currency.symbol" :data="saleGraphData"></column-chart>
+        </div>
+        <div style="margin-top:10px;" v-else>
+        {% sw_include '@Storefront/storefront/utilities/alert.html.twig' with {
+            type: "info",
+            content: "wk-mp.earningPage.nodataMessage"|trans|sw_sanitize
+        } %}</div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>{{"wk-mp.earningPage.intervalColumnLabel"|trans}}</th>
+                    <th>{{"wk-mp.earningPage.ordersColumnLabel"|trans}}</th>
+                    <th>{{"wk-mp.earningPage.totalAmountColumnLabel"|trans}}</th>
+                    <th>{{"wk-mp.earningPage.totalEarningColumnLabel"|trans}}</th>
+                    <th>{{"wk-mp.earningPage.adminCommissionColumnLabel"|trans}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(sale,interval) in salesData" v-if="salesData">
+                    <td>~interval~</td>
+                    <td>~sale.orderCount~</td>
+                    <td>~currency.symbol~~(currency.factor*sale.totalAmount).toFixed(2)~</td>
+                    <td>~currency.symbol~~(currency.factor*sale.earning).toFixed(2)~</td>
+                    <td>~currency.symbol~~(currency.factor*sale.commission).toFixed(2)~</td>
+                </tr>
+            </tbody>
+                {# <div v-if="!salesData"><b>{{"wk-mp.earningPage.nodataMessage"|trans}}</b></div> #}
+        </table>
+        </div>
+    </template>
+    <script type="text/javascript">
+          
+            Vue.use(VueRouter)
+            Vue.use(Chartkick.use(Chart));
+            Vue.component('paginate', VuejsPaginate)
+            Vue.use(VueLoading);
+            Vue.component('loading', VueLoading);
+
+            const router = new VueRouter({
+            });
+            
+            new Vue({
+                router,
+                el: '#app',
+                template: `#earning-template`,
+                data() {    
+                    return{
+                        period: '',
+                        from: '',
+                        to: '',
+                        currency: null,
+                        saleGraphData: null,
+                        salesData: null
+                    }
+                },
+                created(){
+                    this.getFilter();
+                },
+                methods:{
+                    getFilter(){
+                        let url = `${window.baseUrl}/wk/marketplace/earnings/filter?period=${this.period}&from=${this.from}&to=${this.to}`;
+                        axios.get(url).then(response=>{
+                            this.currency = response.data.currency;
+                            this.saleGraphData = response.data.salesGraphData;
+                            this.salesData = response.data.salesListData;
+                            if( $.isArray(this.saleGraphData) ) {
+                                this.saleGraphData = null;
+                                this.salesData = null;
+                            }
+                        })
+                    }
+                },
+                delimiters: ['~', '~']
+            })
+        
+    </script>
+{% endblock %}

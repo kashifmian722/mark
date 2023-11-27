@@ -1,0 +1,40 @@
+{% block mp_mail_template_list %}
+    <sw-page class="">
+        {% block mail_template_smart_bar_header %}
+            <template #smart-bar-header>
+                {% block mp_mail_template_list_smart_bar_header_title %}
+                    <h2>
+                        {% block mp_mail_template_list_smart_bar_header_title_text %}
+                            {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                            {{ $tc('mp-mail.general.mainMenuItemList') }}
+                        {% endblock %}
+
+                        {% block mp_mail_template_list_smart_bar_header_amount %}
+                            <span v-if="total" class="sw-page__smart-bar-amount">
+                                ({{total}})
+                            </span>
+                        {% endblock %}
+                    </h2>
+                {% endblock %}
+            </template>
+        {% endblock %}
+        <template slot="content">
+            <sw-entity-listing
+                    :items="mpMailTemplateCollection"
+                    :repository="repository"
+                    :showSelection="false"
+                    :columns="columns"
+                    detailRoute="mp.mail.template.detail">
+                    <template slot="column-name" slot-scope="{ item }">
+                       {{item.name}}
+                    </template>
+                    <template slot="column-subject" slot-scope="{ item }">
+                       {{item.subject}}
+                    </template>
+
+            </sw-entity-listing>
+
+        </template>
+    </sw-page>
+{% endblock %}

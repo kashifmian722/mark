@@ -1,0 +1,195 @@
+<style>
+    .profile-container {
+        padding: 20px;
+        margin-bottom: 100px;
+    }
+    p {
+        font-size: 16px;
+    }
+    .banner-container {
+        padding: 1px;
+        height: 300px;
+    }
+    img {
+        width: 100%;
+        height: 100%;
+    }
+    .tabs-header {
+        display: grid;
+        font-size: 18px;
+        text-align: center;
+        padding-left: 30px;
+        grid-column-gap: 20px;
+        grid-template-columns: repeat(4, 150px);
+    }
+    .tabs-header > span {
+        cursor: pointer;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 10px;
+    }
+    .tabs-header > span.active {
+        border-bottom: 2px solid;
+    }
+    h1 {
+        margin-bottom: 30px;
+    }
+    .tabs-header h3 {
+        cursor: pointer;
+    }
+    .profile-tabs-container {
+        padding: 20px 0;
+        margin-top: 50px;
+        border-radius: 5px;
+        border: 1px solid #dadae5;
+    }
+    .tabs-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #dadae5;
+    }
+    .profile-center-container {
+        padding: 2%;
+        margin: auto;
+        display: grid;
+        overflow: hidden;
+        grid-template-columns: 2fr 1fr;
+    }
+    .shop-details {
+        grid-template-columns: 1fr 2fr;
+    }
+    .shop-icon {
+        height: 200px;
+        width: 200px;
+        display: inline-block;
+        padding: 5px;
+        text-align: center;
+    }
+    .shop-icon img {
+        border-radius: 5px;
+    }
+    .shop-title {
+        display: inline-block;
+        padding: 5px;
+        vertical-align: top;
+        font-size: 27px;
+        font-style: inherit;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+    .shop-owner-details {
+        display: inline-block;
+        padding: 5px;
+        vertical-align: top;
+        text-align: center;
+        justify-self: end;
+    }
+    .shop-owner-icon {
+        margin: auto;
+        width: 100px;
+        height: 100px;
+        display: inline-block;
+    }
+    .shop-owner-icon img {
+        border-radius: 50%;
+    }
+    
+    .tabs-body-wrapper {
+        padding-left: 50px;
+    }
+    .tabs-body-wrapper {
+        display: inline-block;
+        width: calc(100% - 50px);
+    }
+    i.mp-icon {
+        font-size: 25px;
+        user-select: none;
+        font-style: normal;
+    }
+    .mp-add-review {
+        float: right;
+        cursor: pointer;
+    }
+    .mp-review--star {
+        color: orange;
+    }
+    .mp-review--star.editable {
+        cursor: pointer;
+    }
+    textarea {
+        width: 500px;
+    }
+    .social-link-wrapper h5 {
+        display: inline-block;
+    }
+    .product-image{
+        display: none;
+    }
+    .public-profile-product-show {
+        display: block;
+    }
+    .review-date {
+        margin-left: 10px;
+        vertical-align: super;
+    }
+    .review-description {
+        margin-top: 20px;
+    }
+    .add-review-form-container label {
+        display: block;
+    }
+    .asterisk {
+        color: red;
+        font-size: 20px;
+        margin-right: 2px;
+        vertical-align: top;
+    }
+    .add-review-form-wrapper {
+        width: 30%;
+    }
+    input,
+    textarea {
+        width: 100%;
+        padding: 10px;
+        height: 35px;
+        border-radius: 3px;
+        border: 1px solid #dadae5;
+    }
+    .review-submit-btn {
+        margin-top: 20px;
+    }
+    .review-label {
+        font-size: 17px;
+        font-weight: 600;
+    }
+    .profile-tab-container {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+    .profile-tab-container button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 17px;
+        color: #000;
+    }
+    .profile-tab-container button:hover {
+        background-color: #ddd;
+    }
+    .profile-tab-container button.active {
+        background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+</style>
+

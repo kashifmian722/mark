@@ -1,0 +1,43 @@
+{
+    "mp-product": {
+        "general": {
+            "mainMenuItemGeneral": "Marktplatz Produkte",
+            "descriptionTextModule": "Verwalten Sie hier Ihre Marktplatzprodukte",
+            "mainMenuItemList": "Produkte",
+            "productIcon": "default-symbol-products",
+            "mainMenuItemListHeading": "Produkte des Verkäufers verwalten"
+        },
+        "list": {
+            "details": "",
+            "messageEmpty": "Noch keine Produkte.",
+            "columnCollection": ["Produktname", "Name des Verkäufers", "E-Mail des Verkäufers", "Preis", "Lager", "Status", "Produktansicht"],
+            "titleSaveSuccess": "Erfolg",
+            "messageSaveSuccess": "Produkt wurde aktualisiert.",
+            "titleSaveError": "Error",
+            "messageSaveError": "Leider ist etwas schief gelaufen.",
+            "approveText": "Genehmigen",
+            "disapproveText": "Missbilligen",
+            "messageDeleteSuccess": "Produkt erfolgreich gelöscht",
+            "addProductLabel": "Produkt hinzufügen"
+        },
+        "detail": {
+            "nameLabel": "Name",
+            "cancelButtonText": "Stornieren",
+            "saveButtonText": "Einstellungen speichern",
+            "errorTitle": "Fehler beim Speichern des Bundles",
+            "absoluteText": "Absolut",
+            "percentageText": "Prozentsatz",
+            "sellerButtonText": "Verkäuferinnen",
+            "productsButtonText": "Produkte",
+            "ordersButtonText": "Aufträge",
+            "selectProductLabel": "Produkte auswählen",
+            "selectSellerLabel": "Verkäufer auswählen",
+            "selectSellerPlacehoder": "Wählen Sie einen Verkäufer aus, um Produkte zuzuweisen",
+            "successTitle": "Erfolg",
+            "assignProductSuccessMessage": "Produkt erfolgreich zugewiesen",
+            "infoTitle": "Die Info",
+            "selectProductMessage": "Bitte wählen Sie die Produkte aus",
+            "selectSellerMessage": "Bitte wählen Sie den Verkäufer aus"
+        }
+    }
+}

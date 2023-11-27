@@ -1,0 +1,81 @@
+<template id="category-inner-template">
+    <ul :id="parentId" class="category-tree-container">
+        <li v-for="(categoryChild, index) in categoryData" :key="index">
+            <template v-if="categoryChild.childCount > 0">
+                <div  class="category-row-container">
+                    <i @click="toggleCategorySlider(categoryChild.id)" :class="categoryChild.children.length > 0 ? 'down' : 'right'"></i>
+                    <input type="radio" class="category-method-input" :value="categoryChild.id" @click="selectCategory(categoryChild)" v-if="isCategorySelected(categoryChild.id)" checked="checked" />
+                    <input type="radio" class="category-method-input" :value="categoryChild.id" @click="selectCategory(categoryChild)" v-else />
+                    <strong>~categoryChild.translated.name~</strong>
+                </div>
+            </template>
+
+            <template v-else>
+                <div class="category">
+                    <div class="category-form-group">
+                        <div class="custom-radio category-control">
+                            <input type="radio" class="category-method-input" :value="categoryChild.id" @click="selectCategory(categoryChild)" v-if="isCategorySelected(categoryChild.id)" checked="checked" />
+                            <input type="radio" class="category-method-input" :value="categoryChild.id" @click="selectCategory(categoryChild)" v-else />
+
+                            <div class="category-method-label display-inline-block" for="category">
+                                <div class="category-method-description">
+                                    <p>~categoryChild.translated.name~</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <category-inner :category-data="categoryChild.children" :environment="environment"></category-inner>
+        </li>
+    </ul>
+</template>
+
+<script type="text/javascript">
+    Vue.component('category-inner', {
+        props: ['categoryData', 'parentId', 'environment'],
+        template: '#category-inner-template',
+        data: function () {
+            return {
+                isCategoryView: {},
+            }
+        },
+
+        methods: {
+            toggleCategorySlider: function (treeParentId) {
+                // check if already opened
+                var selectedCategory = this.$root.matchParentCategoryId(this.categoryData, treeParentId)[0];
+                if (!selectedCategory.children.length > 0) {
+                    let url =  "{{ path('frontend.marketplace.api.category.tree')}}"
+
+                    axios.get(url,{params:{treeParentId}})
+                    .then(response => {
+                        selectedCategory.children = this.$root.setFormattedCategories(response.data.categories.elements);
+                    })
+                    .catch(error => {
+                    })
+                } else {
+                    selectedCategory.children = [];
+                }
+            },
+
+            selectCategory: function (selectedCategory) {
+                let existingCategory = this.$root.product.categories.filter(category => category.id == selectedCategory.id);
+
+                if (!existingCategory.length) {
+                    this.$root.product.categories.push(selectedCategory);
+                }
+            },
+
+            isCategorySelected: function (categoryId) {
+                let filteredCategory = [];
+                if (this.$root.product.categories && this.$root.product.categories.length > 0) {
+                    filteredCategory = this.$root.product.categories.filter(category => category.id == categoryId);
+                }
+
+                return filteredCategory.length;
+            }
+        },
+        delimiters: ['~', '~']
+    })
+</script>

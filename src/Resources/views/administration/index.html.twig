@@ -1,0 +1,13 @@
+{% sw_extends 'administration/index.html.twig' %}
+
+{% block administration_stylesheets %}
+    {{ parent() }}
+
+     <link rel="stylesheet" href="{{ asset('bundles/webkulmvmarketplace/administration/css/webkul-mvmarketplace.css') }}?{{ 'now'|date('U') }}"/>
+{% endblock %}
+
+{% block administration_scripts %}
+    {{ parent() }}
+
+    <script type="text/javascript" src="{{ asset('bundles/webkulmvmarketplace/administration/js/webkul-mvmarketplace.js') }}"></script>
+{% endblock %}

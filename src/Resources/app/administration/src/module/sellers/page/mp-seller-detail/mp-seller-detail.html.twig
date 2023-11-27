@@ -1,0 +1,114 @@
+{% block wk_mp_seller_detail %}
+    <sw-page>
+        {% block wk_mp_seller_smart_bar_actions %}
+            <template slot="smart-bar-actions">
+                <sw-button :routerLink="{name: 'mp.seller.list'}">
+                    {{$t('mp-seller.detail.cancelButtonText')}}
+                </sw-button>
+                <sw-button-process
+                    :isLoading="isLoading"
+                    :processSuccess="processSuccess"
+                    variant="primary"
+                    @process-finish="saveFinish"
+                    @click="onClickSave">
+                    {{ $t('mp-seller.detail.saveButtonText') }}
+                </sw-button-process>
+            </template>
+        {% endblock %}
+        {% block wk_mp_seller_content %}
+            <template slot="content">
+                <sw-card-view>
+                    <sw-card v-if="sellerInfo" :isLoading="isLoading">
+                        {% block wk_mp_seller_commission_input %}
+                            <sw-number-field number-type="float" :label="$t('mp-seller.detail.commissionLabel')"
+                                v-model="sellerInfo.adminCommission" :error="sellerInfo.AdminCommissionError"> 
+                            </sw-number-field>
+                        {% endblock %}
+
+                        {% block wk_mp_seller_store_logo %}
+                        
+                         <sw-upload-listener
+                                :uploadTag="sellerInfo.id"
+                                 @media-upload-finish="onSetMediaStore"
+                                autoUpload>
+                        </sw-upload-listener>
+                         <sw-media-upload-v2
+                                :label="$tc('mp-seller.detail.storelogoLabel')"
+                                variant="regular"
+                                :source="sellerInfo.storeLogoId"
+                                :uploadTag="sellerInfo.id"
+                                :allowMultiSelect="false"
+                                @media-drop="onMediaDroppedStore"
+                                @media-upload-remove-image="onRemoveMediaStore">
+                        </sw-media-upload-v2>
+
+
+                        {% endblock %}
+
+                        {% block wk_mp_seller_banner_logo %}
+                       <sw-upload-listener
+                                :uploadTag="sellerInfo.customerId"
+                                 @media-upload-finish="onSetMediaBanner"
+                                autoUpload>
+                        </sw-upload-listener>
+                         <sw-media-upload-v2
+                                :label="$tc('mp-seller.detail.bannerlogoLabel')"
+                                variant="regular"
+                                :source="sellerInfo.storeBannerId"
+                                :uploadTag="sellerInfo.customerId"
+                                :allowMultiSelect="false"
+                                @media-drop="onMediaDroppedBanner"
+                                @media-upload-remove-image="onRemoveMediaBanner">
+                        </sw-media-upload-v2>
+                        {% endblock %}
+
+                        {% block wk_mp_seller_owner_logo %}
+                           <sw-upload-listener
+                                :uploadTag="storeOwner"
+                                 @media-upload-finish="onSetMediaOwner"
+                                autoUpload>
+                        </sw-upload-listener>
+                         <sw-media-upload-v2
+                                :label="$tc('mp-seller.detail.ownerlogoLabel')"
+                                variant="regular"
+                                :source="sellerInfo.storeOwnerId"
+                                :uploadTag="storeOwner"
+                                :allowMultiSelect="false"
+                                @media-drop="onMediaDroppedOwner"
+                                @media-upload-remove-image="onRemoveMediaOwner">
+                        </sw-media-upload-v2>
+                        {% endblock %}
+
+                        {% block wk_mp_seller_store_slug %}
+                        <sw-text-field v-model="sellerInfo.storeSlug" :label="$t('mp-seller.detail.storeSlugLabel')">
+                        </sw-text-field>
+
+                        {% endblock %}
+                         {% block wk_mp_seller_store_owner %}
+                        <sw-text-field v-model="sellerInfo.storeOwner" :label="$t('mp-seller.detail.storeOwnerLabel')">
+                        </sw-text-field>
+
+                        {% endblock %}
+                         {% block wk_mp_seller_store_title %}
+                        <sw-text-field v-model="sellerInfo.storeTitle" :label="$t('mp-seller.detail.storeTitleLabel')">
+                        </sw-text-field>
+                        {% endblock %}
+                         {% block wk_mp_seller_store_description %}
+                        <sw-text-editor v-model="sellerInfo.storeDescription"   :label="$t('mp-seller.detail.storeDescriptionLabel')">
+                        </sw-text-editor>
+
+                        {% endblock %}
+                        {% block wk_mp_seller_profile_active %}
+                            <sw-switch-field v-model="sellerInfo.profileStatus" :label="$t('mp-seller.detail.profileStatusLabel')">
+                            </sw-switch-field>
+                        {% endblock %}
+                        {# {% block wk_mp_seller_active %}
+                            <sw-switch-field v-model="sellerInfo.isApproved" :label="$t('mp-seller.detail.sellerStatusLabel')">
+                            </sw-switch-field>
+                        {% endblock %} #}
+                    </sw-card>
+                </sw-card-view>
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}

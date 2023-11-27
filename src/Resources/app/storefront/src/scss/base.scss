@@ -1,0 +1,165 @@
+.wk-mp-landingpage .wk-mp-banner-container {
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(238, 238, 238);
+    border-image: initial;
+    padding: 2%;
+}
+.wk-mp-landingpage {
+    text-align: center;
+}
+.wk-mp-landingpage-layout1 *, .wk-mp-landingpage-layout2 *, .wk-mp-landingpage-layout3 * {
+    box-sizing: border-box;
+}
+.wk-mp-header {
+    color: rgb(255, 255, 255);
+    text-align: center;
+    padding: 6.5%;
+}
+.wk-mp-header h1 {
+    font-size: 3.9em;
+    color: rgb(255, 255, 255);
+    margin-bottom: 0.3em;
+    font-weight: 700;
+    overflow-wrap: break-word;
+}
+.wk-mp-header h2 {
+    font-size: 32px;
+    color: rgb(255, 255, 255);
+    text-transform: inherit;
+}
+
+.wk-mp-landing-button {
+    font-size: 18px;
+    padding: 15px 20px;
+    border: none;
+}
+.wk-mp-header p {
+    margin-bottom: 0px;
+    font-size: 16px;
+}
+.wk-marketplace-label {
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding-top: 3.3%;
+    text-align: center;
+}
+.wk-mp-landingpage-one-icon-container .wk-mp-icon-wraper {
+    width: 25%;
+    vertical-align: top;
+    padding: 0px 15px;
+    display: inline-block;
+}
+.wk-mp-landingpage-one-icon-container .wk-mp-icon {
+    width: auto;
+}
+.wk-mp-landingpage-one-icon-container .wk-marketplace-label-span {
+    font-size: 18px;
+    margin-top: 10px;
+}
+.wk-mp-icon img {
+    display: inline-block;
+    width: 80%;
+}
+.wk-mp-icon-container.wk-mp-landingpage-one-icon-container {
+    font-size: 0;
+}
+.wk-mp-landing-sellers-wraper {
+    width: 284px;
+    display: inline-block;
+    border: 1px solid #eee;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.wk-mp-landing-sellers {
+    padding: 10px;
+}
+.wk-mp-landing-sellers-img1 {
+    width: 100%;
+}
+.wk-mp-landing-sellers-img1 img {
+    width: 130px;
+    border: 1px solid #eee;
+    float: left;
+}
+.wk-mp-landing-sellers-img2 {
+    width: 260px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+.wk-mp-landing-sellers-img2 img {
+    width: 100%;    
+    height: 100%;
+}
+.wk-mp-landing-sellers-logo {
+    width: 40%;
+    float: left;
+    border: 1px solid #eee;
+    height: 90px;
+    position: relative;
+}
+.wk-mp-landing-sellers-logo img {
+    width: 100%;
+    height: 100%;
+}
+.wk-mp-landing-sellers-details{
+    text-transform: uppercase;
+    width: 60%;
+    float: left;
+}
+.wk-mp-label3-container {
+    margin-top: 10px;
+    width: 100%;
+}
+.wk-mp-label3 {
+    border: 1px solid #eee;
+    padding: 10px;
+}
+.wk-marketplace-label-about {
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Style tab links */
+.tablink {
+    background-color: #555;
+    color: white;
+    border: 1px solid #ffff;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    margin-right: 5px;
+    text-align: center;
+    min-width: 19%;
+    font-size: 17px;
+    width:auto;
+    }
+
+    .tablink:hover {
+    background-color: #777;
+    }
+
+    /* Style the tab content (and add height:100% for full page content) */
+    .tabcontent {
+    display: none;
+    padding: 20px 20px;
+    height: 100%;
+    border: 1px solid #ccc!important;
+    }
+
+    @media screen and (max-width: 400px){
+        .tablink{
+            padding: 14px 8px;
+            font-size: 14px;
+            margin-right: 1px;
+        }
+    }
+    .fa {
+        width: 30px;
+        color:#626b69;
+        text-align: center;
+        text-decoration: none;
+        margin: 5px 2px;
+    }

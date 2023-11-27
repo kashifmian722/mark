@@ -1,0 +1,31 @@
+{% block mp_mail_template %}
+    <sw-page>
+        {% block wk_mp_mail_smart_bar_actions %}
+            <template slot="smart-bar-actions">
+                <sw-button :routerLink="{name: 'mp.mail.template.list'}">
+                    {{$t('mp-seller.detail.cancelButtonText')}}
+                </sw-button>
+                <sw-button-process
+                    :isLoading="isLoading"
+                    :processSuccess="processSuccess"
+                    variant="primary"
+                    @click="onClickSave">
+                    {{ $t('mp-seller.detail.saveButtonText') }}
+                </sw-button-process>
+            </template>
+        {% endblock %}
+        {% block wk_mp_mail_content %}
+            <template slot="content">
+                <sw-card-view>
+                    <sw-card v-if="templateData" :isLoading="isLoading">
+                        <sw-text-field v-model="templateData.name" :label="$t('mp-mail.list.nameColumn')"></sw-text-field>
+                        <sw-text-field v-model="templateData.subject" :label="$t('mp-mail.list.subjectColumn')"></sw-text-field>
+                        <sw-text-editor v-model="templateData.message" :label="$t('mp-mail.list.messageColumn')"> </sw-text-editor>
+                        
+                    </sw-card>
+                </sw-card-view>
+            </template>
+        {% endblock %}
+    </sw-page>
+
+{% endblock %}

@@ -1,0 +1,193 @@
+<sw-page class="mp-product-list">
+
+    {% block mp_product_list_smart_bar_header %}
+        <template #smart-bar-header>
+            {% block mp_product_list_smart_bar_header_title %}
+                <h2>
+                    {% block mp_product_list_smart_bar_header_title_text %}
+                        {{ $tc('sw-settings.index.title') }}
+                            <sw-icon name="small-arrow-medium-right" small></sw-icon>
+                        {{ $tc('mp-product.general.mainMenuItemListHeading') }}
+                    {% endblock %}
+
+                    {% block mp_product_list_smart_bar_header_amount %}
+                        <span v-if="productListLoader" class="sw-page__smart-bar-amount">
+                            ({{ total }})
+                        </span>
+                    {% endblock %}
+                </h2>
+            {% endblock %}
+        </template>
+        <template #smart-bar-actions>
+            <sw-button :routerLink="{name: 'mp.product.assign'}">{{ $tc('mp-product.list.addProductLabel')}}</sw-button>
+        </template>
+    {% endblock %}
+
+    <template slot="content">
+        {% block webkul_bundle_list_content %}
+            <sw-entity-listing
+                v-if="marketplaceProductCollection"
+                :isLoading="productListLoader"
+                :items="marketplaceProductCollection"
+                :repository="mpProductRepository"
+                :showSelection="true"
+                :columns="columns"
+                @select-item="onSelectionChanged"
+                @select-all-items="onSelectionChanged"
+                @column-sort="onSortColumn"
+                @inline-edit-save="onInlineEditSave">
+
+                {# Product's title #}
+                <template slot="column-productName" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.product.detail.base', params: { id: item.product.id }  }">
+                        {{ item.product.translated.name }}
+                    </router-link>
+                </template>
+
+                {# Seller's Name #}
+                <template slot="column-marketplaceSellerName" slot-scope="{ item }">
+                    {{ item.marketplace_seller.customer.firstName }} {{ item.marketplace_seller.customer.lastName }}
+                </template>
+
+                {# Seller's Email #}
+                <template slot="column-marketplaceSellerEmail" slot-scope="{ item }">
+                    <router-link :to="{ name: 'sw.customer.detail.base', params: { id: item.marketplace_seller.customer.id }  }">
+                        {{ item.marketplace_seller.customer.email }}
+                    </router-link>
+                </template>
+
+                {# Product's price #}
+                {% block mp_product_list_grid_columns_price %}
+                    <template v-for="currency in currencies"
+                                :slot="`column-price-${currency.isoCode}`"
+                                slot-scope="{ item }">
+                        {{ getCurrencyPriceByCurrencyId(item.id, currency.id).gross | currency(currency.isoCode) }}
+                    </template>
+                {% endblock %}
+
+                {# Product's stock #}
+                <template slot="column-stock" slot-scope="{ item }">
+                    {{ item.product.stock }}
+                </template>
+
+                {# Product status #}
+                <template slot="column-status" slot-scope="{ item, isInlineEdit }">
+                    <template v-if="isInlineEdit">
+                        <sw-checkbox-field v-model="item.product.active"></sw-checkbox-field>
+                    </template>
+
+                    <template v-else>
+                        <sw-icon v-if="item.product.active" name="small-default-checkmark-line-medium" small class="is--active"></sw-icon>
+                        <sw-icon v-else name="small-default-x-line-medium" small class="is--inactive"></sw-icon>
+                    </template>
+                </template>
+
+                {# Product View #}
+                {# <template slot="column-viewProduct" slot-scope="{ item }">
+                    <a :href="`${baseUrl}${item.product.name}/${item.product.productNumber}`" class="mp-product-view" target="_blank">
+                        <sw-label appearance="pill">
+                            VIEW
+                        </sw-label>
+                    </a>
+                </template> #}
+                {# delete modal #}
+                    
+                    {% block mp_seller_list_grid_action_modals %}
+                        <template #action-modals="{ item }">
+                            {% block mp_seller_list_delete_modal %}
+                                <sw-modal v-if="showDeleteModal === item.id"
+                                            @modal-close="onCloseDeleteModal"
+                                            :title="$tc('global.entity-components.deleteTitle')"
+                                            variant="small">
+                                    {% block mp_seller_list_delete_modal_confirm_delete_text %}
+                                        <p>
+                                            {{ $tc('global.entity-components.deleteMessage')}}
+                                        </p>
+                                    {% endblock %}
+
+                                    {% block mp_sellerlist_delete_modal_footer %}
+                                        <template #modal-footer>
+                                            {% block mp_seller_list_delete_modal_cancel %}
+                                                <sw-button @click="onCloseDeleteModal" size="small">
+                                                    {{ $tc('global.default.cancel') }}
+                                                </sw-button>
+                                            {% endblock %}
+
+                                            {% block mp_seller_list_delete_modal_confirm %}
+                                                <sw-button @click="onConfirmDelete(item.id)" variant="primary" size="small">
+                                                    {{ $tc('global.default.delete') }}
+                                                </sw-button>
+                                            {% endblock %}
+                                        </template>
+                                    {% endblock %}
+                                </sw-modal>
+                            {% endblock %}
+                        </template>
+                    {% endblock %}
+
+                {# bulk delete modal #}
+                    {% block sw_data_grid_slot_bulk_modals %}
+                    <template #bulk-modals="{ item }">
+                        <sw-modal v-if="showBulkDeleteModal"
+                                @modal-close="showBulkDeleteModal = false"
+                                :title="$tc('global.entity-components.deleteTitle')"
+                                variant="small">
+                            <p class="sw-data-grid__confirm-bulk-delete-text">
+                                {{ $tc('global.entity-components.deleteMessage') }}
+                            </p>
+
+                            <template #modal-footer>
+                                <sw-button @click="showBulkDeleteModal = false" size="small">
+                                    {{ $tc('global.default.cancel') }}
+                                </sw-button>
+
+                                <sw-button @click="deleteItems" variant="primary" size="small" :isLoading="isBulkLoading">
+                                    {{ $tc('global.default.delete') }}
+                                </sw-button>
+                            </template>
+                        </sw-modal>
+                    </template>
+                    {% endblock %}
+
+                 {# inline delete action #}
+                    {% block mp_product_list_grid_columns_actions %}
+                        <template #actions="{ item }">
+                          
+                            {% block wk_question_list_grid_columns_actions_delete %}
+                                <sw-context-menu-item variant="danger" @click="onDelete(item.id)">
+                                    {{ $tc('global.default.delete') }}
+                                </sw-context-menu-item>
+                            {% endblock %}
+                        </template>
+                    {% endblock %}
+
+                {# Bulk Approve and disapprove link#}
+                <template slot="bulk">
+                        {% block sw_data_grid_bulk_selected_actions_content %}
+                            <span class="sw-data-grid__bulk-selected bulk-link">
+                            <sw-button-process @click="approveProduct" :processSuccess="approveProcess">
+                                {{ $tc('mp-product.list.approveText') }}
+                            </sw-button-process>
+                            </span>
+                            <sw-loader size="50px" v-if="approveProcess">
+                            </sw-loader>
+                            <sw-loader size="50px" v-if="disapproveProcess">
+                            </sw-loader>
+                            <span class="sw-data-grid__bulk-selected bulk-link">
+                            <sw-button-process @click="disapproveProduct" :processSuccess="disapproveProcess">
+                                {{ $tc('mp-product.list.disapproveText') }}
+                            </sw-button-process></span>
+                            <span>
+                                <a class="link link-danger" @click="showBulkDeleteModal = true">
+                                    {{ $tc('global.default.delete') }}
+                                </a>
+                            </span>
+                        {% endblock %}
+                </template>
+            </sw-entity-listing>
+
+            <sw-empty-state v-if="productListLoader && !total" :icon="$tc('mp-product.general.productIcon')" :title="$tc('mp-product.list.messageEmpty')" color="rgb(87, 217, 163)"></sw-empty-state>
+        {% endblock %}
+    </template>
+
+</sw-page>
